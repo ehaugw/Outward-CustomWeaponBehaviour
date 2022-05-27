@@ -1,0 +1,50 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using TinyHelper;
+using UnityEngine;
+
+namespace CustomWeaponBehaviour
+{
+    public class ParryBehaviour
+    {
+        public virtual float GetParryWindow(Weapon weapon)
+        {
+            return 0.35f;
+        }
+        public virtual float GetParryWindUp(Weapon weapon)
+        {
+            return 0.05f;
+        }
+
+        public bool IsParryMode(Weapon weapon)
+        {
+            return weapon.IsEquipped && Eligible(weapon) && (weapon.OwnerCharacter?.LeftHandEquipment == null || OffhandEligible(weapon?.OwnerCharacter));
+        }
+
+        public virtual bool OffhandEligible(Character character)
+        {
+            return character?.LeftHandEquipment is Weapon offhand && (offhand.Type != Weapon.WeaponType.Shield || offhand.HasTag(CustomWeaponBehaviour.BucklerTag));
+        }
+
+        public virtual bool Eligible(Weapon weapon)
+        {
+            return weapon.HasTag(CustomWeaponBehaviour.ParryTag);
+        }
+
+        public virtual bool DidSuccessfulParry(Weapon weapon)
+        {
+            return IsParryMode(weapon)
+                && weapon.OwnerCharacter is Character character
+                && character.Blocking && Time.time - ((float)SideLoader.At.GetField<Character>(character, "m_blockTime")) < this.GetParryWindow(weapon)
+                && character.Blocking && Time.time - ((float)SideLoader.At.GetField<Character>(character, "m_blockTime")) > this.GetParryWindUp(weapon);
+        }
+
+        public virtual void DeliverParry(Character blocker, Character striker, Vector3 _hitDir, float impactDamage)
+        {
+            SideLoader.At.Invoke<Character>(striker, "StabilityHit", new object[] { impactDamage, Vector3.Angle(striker.transform.forward, -_hitDir), false, blocker });
+            CasualStagger.Stagger(striker);
+        }
+    }
+}
