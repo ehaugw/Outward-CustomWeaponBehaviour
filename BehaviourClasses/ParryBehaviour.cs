@@ -11,11 +11,11 @@ namespace CustomWeaponBehaviour
     {
         public virtual float GetParryWindow(Weapon weapon)
         {
-            return 0.35f;
+            return 0.30f;
         }
         public virtual float GetParryWindUp(Weapon weapon)
         {
-            return 0.05f;
+            return 0.10f;
         }
 
         public bool IsParryMode(Weapon weapon)
@@ -43,7 +43,7 @@ namespace CustomWeaponBehaviour
 
         public virtual void DeliverParry(Character blocker, Character striker, Vector3 _hitDir, float impactDamage)
         {
-            SideLoader.At.Invoke<Character>(striker, "StabilityHit", new object[] { impactDamage, Vector3.Angle(striker.transform.forward, -_hitDir), false, blocker });
+            SideLoader.At.Invoke<Character>(striker, "StabilityHit", new object[] { impactDamage / 2, Vector3.Angle(striker.transform.forward, -_hitDir), false, blocker });
             CasualStagger.Stagger(striker);
         }
     }
