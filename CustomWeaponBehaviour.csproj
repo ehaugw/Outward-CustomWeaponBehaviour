@@ -38,6 +38,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BehaviourClasses\MaulShoveBehaviour.cs" />
     <Compile Include="BehaviourClasses\BastardBehaviour.cs" />
     <Compile Include="BehaviourClasses\AttackCancelByBlockBehaviour.cs" />
     <Compile Include="BehaviourClasses\AttackCancelBySkillBehaviour.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="Effects\WeaponSkillAnimationSelector.cs" />
     <Compile Include="HarmonyClasses.cs" />
     <Compile Include="CustomWeaponBehaviour.cs" />
+    <Compile Include="ModifierClasses\MaulShoveModifier.cs" />
     <Compile Include="ModifierClasses\BastardModifier.cs" />
   </ItemGroup>
   <ItemGroup>
