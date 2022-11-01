@@ -11,7 +11,12 @@ namespace CustomWeaponBehaviour
     {
         public bool IsHalfHandedMode(Weapon weapon)
         {
-            return weapon.IsEquipped && Eligible(weapon) && weapon.OwnerCharacter?.LeftHandEquipment == null && !weapon.TwoHanded;
+            return Eligible(weapon) && weapon.IsEquipped
+                && (
+                    weapon.OwnerCharacter?.LeftHandEquipment == null ||
+                    (weapon.OwnerCharacter?.LeftHandEquipment is Equipment leftHand && leftHand.HasTag(CustomWeaponBehaviour.HandsFreeTag)/* && leftHand.IKType == Equipment.IKMode.None*/)
+                )
+                && !weapon.TwoHanded;
         }
 
         public virtual bool Eligible(Weapon weapon)

@@ -32,7 +32,7 @@ namespace CustomWeaponBehaviour
             }
             return modifier;
         }
-
+        
         public virtual float GetBastardDamageBonus(Weapon weapon)
         {
             float modifier = 1;
@@ -42,10 +42,19 @@ namespace CustomWeaponBehaviour
             }
             return modifier;
         }
+        public virtual float GetBastardImpactBonus(Weapon weapon)
+        {
+            float modifier = 1;
+            foreach (var modObj in CustomWeaponBehaviour.BastardModifiers)
+            {
+                modObj.ApplyImpactModifier(weapon, ref modifier);
+            }
+            return modifier;
+        }
 
         public virtual bool Eligible(Weapon weapon)
         {
-            return weapon.HasTag(CustomWeaponBehaviour.BastardTag);
+            return weapon.HasTag(CustomWeaponBehaviour.BastardTag) && !weapon.TwoHanded;
         }
 
         public bool IsBastardMode(Weapon weapon)
@@ -53,9 +62,8 @@ namespace CustomWeaponBehaviour
             return Eligible(weapon) && weapon.IsEquipped
                 && (
                     weapon.OwnerCharacter?.LeftHandEquipment == null || 
-                    (weapon.OwnerCharacter?.LeftHandEquipment is Equipment leftHand && leftHand.HasTag(TinyTagManager.GetOrMakeTag("TinyTrinketTag"))/* && leftHand.IKType == Equipment.IKMode.None*/)
-                )
-                && !weapon.TwoHanded;
+                    (weapon.OwnerCharacter?.LeftHandEquipment is Equipment leftHand && leftHand.HasTag(CustomWeaponBehaviour.HandsFreeTag)/* && leftHand.IKType == Equipment.IKMode.None*/)
+                ) && !CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsActive(weapon);
         }
 
         public void BastardPostAmplifyWeaponDamage(ref Weapon weapon, ref DamageList _damageList)
@@ -65,10 +73,17 @@ namespace CustomWeaponBehaviour
                 _damageList *= this.GetBastardDamageBonus(weapon);
             }
         }
+        public void BastardPostAmplifyWeaponImpact(ref Weapon weapon, ref float _impactDamage)
+        {
+            if (this.IsBastardMode(weapon))
+            {
+                _impactDamage *= this.GetBastardImpactBonus(weapon);
+            }
+        }
 
         public void BastardPostAmplifySpeed(ref Weapon weapon, ref float result)
         {
-            if (this.IsBastardMode(weapon))
+            if (this.IsBastardMode(weapon) && !CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsActive(weapon))
             {
                 result += this.GetBastardSpeedBonus(weapon);
             }

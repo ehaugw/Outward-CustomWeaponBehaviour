@@ -9,6 +9,7 @@
     using System.Collections.Generic;
     using InstanceIDs;
     using System;
+    using System.Linq;
 
     [BepInPlugin(GUID, NAME, VERSION)]
     [BepInDependency("com.sinai.SideLoader", BepInDependency.DependencyFlags.SoftDependency)]
@@ -20,9 +21,9 @@
         public const string VERSION = "2.2.0";
         public const string NAME = "Custom Weapon Behaviour";
         //2.2.0 changes:
-        // parry window: 0.5 sec to 0.35 sec
+        // parry window: 0.1 sec to 0.3 sec
         // parry windup: 0.0 sec to 0.05 sec
-        // support TinyTrinket for bastard weapons
+        // support HandsFreeTag for bastard weapons
         public static CustomWeaponBehaviour Instance;
         public static Tag BastardTag;
         public static Tag FinesseTag;
@@ -32,27 +33,36 @@
         public static Tag ParryTag;
         public static Tag BucklerTag;
         public static Tag WandTag;
-        public static Tag TinyTrinketTag;
+        public static Tag HandsFreeTag;
+        public static Tag LanternTag;
+        public static Tag MaulShoveTag;
 
         public BastardBehaviour bastardBehaviour = new BastardBehaviour();
+        public MaulShoveBehaviour maulShoveBehaviour = new MaulShoveBehaviour();
         public FinesseBehaviour finesseBehaviour = new FinesseBehaviour();
         public HalfHandedBehaviour halfHandedBehaviour = new HalfHandedBehaviour();
+
         public HolyBehaviour holyBehaviour = new HolyBehaviour();
         public ParryBehaviour parryBehaviour = new ParryBehaviour();
         public AttackCancelByBlockBehaviour attackCancelByBlockBehaviour = new AttackCancelByBlockBehaviour();
         public AttackCancelBySkillBehaviour attackCancelBySkillBehaviour = new AttackCancelBySkillBehaviour();
 
         public static List<BastardModifier> BastardModifiers = new List<BastardModifier>();
+        public static List<MaulShoveModifier> MaulShoveModifiers = new List<MaulShoveModifier>();
+
+
 
         internal void Awake()
         {
             BastardModifiers.Add(new BastardModifier());
+            MaulShoveModifiers.Add(new MaulShoveModifier());
 
             Instance = this;
             var harmony = new Harmony(GUID);
             harmony.PatchAll();
 
             SL.BeforePacksLoaded += BeforePacksLoaded;
+            SL.OnPacksLoaded += OnPacksLoaded;
             TinyHelper.OnDescriptionModified += CustomTagDescriptionModifier;
         }
 
@@ -89,11 +99,23 @@
             HalfHandedTag = TinyTagManager.GetOrMakeTag("HalfHanded");
             SpecialLeapTag = TinyTagManager.GetOrMakeTag("SpecialLeap");
             WandTag = TinyTagManager.GetOrMakeTag(IDs.WandTag);
-            TinyTrinketTag = TinyTagManager.GetOrMakeTag(IDs.TinyTrinketTag);
+            HandsFreeTag = TinyTagManager.GetOrMakeTag(IDs.HandsFreeTag);
+            LanternTag = TinyTagManager.GetOrMakeTag(IDs.LanternTag);
+            MaulShoveTag = TinyTagManager.GetOrMakeTag(IDs.MaulShoveTag);
+        }
+
+        private void OnPacksLoaded()
+        {
+            //var oldLantern = ResourcesPrefabManager.Instance.GetItemPrefab(IDs.oldLanternID) as Skill;
+            //CustomItems.SetItemTags(oldLantern, new string[] { IDs.HandsFreeTag }, false);
+            //TagSourceSelector[] tagSelectorList = oldLantern.Tags.Select(x => new TagSourceSelector(x)).AddItem(new TagSourceSelector(HandsFreeTag)).ToArray();
+            //new TagSourceSelector[] { new TagSourceSelector(HandsFreeTag) };
+            //oldLantern. = tagSelectorList;
         }
 
         public static void ChangeGrip(Character character, Weapon.WeaponType toMoveset)
         {
+            //WHY?
             character.Inventory.SkillKnowledge.AddItem(new Item());
 
             character?.Animator?.SetInteger("WeaponType", (int) toMoveset);
@@ -103,6 +125,8 @@
         {
             if (character?.CurrentWeapon is Weapon weapon)
                 character?.Animator?.SetInteger("WeaponType", (int)weapon.Type);
+            if (character?.LeftHandEquipment is Equipment item && item.HasTag(HandsFreeTag) && item.HasTag(LanternTag) && item.IKType == Equipment.IKMode.None)
+                item.IKType = Equipment.IKMode.Lantern;
         }
     }
 }

@@ -67,6 +67,16 @@ namespace CustomWeaponBehaviour
                 }
             }
 
+            if (CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsMaulShoveMode(_weapon))
+            {
+                if (_type == 1 && !IsComboAttack(__instance, _type, _id))
+                {
+                    CustomWeaponBehaviour.ChangeGrip(__instance, Weapon.WeaponType.Mace_2H);
+                    //_weapon.Unblockable
+                    return true;
+                }
+            }
+
             if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(_weapon))
             {
                 if (BastardBehaviour.GetBastardType(_weapon.Type) is Weapon.WeaponType bastardType)
@@ -74,6 +84,8 @@ namespace CustomWeaponBehaviour
                     if (new int[] {0, 1, 2500}.Contains(_type)) //Basic attacks and predator leap
                     {
                         CustomWeaponBehaviour.ChangeGrip(__instance, bastardType);
+                        if (__instance?.LeftHandEquipment is Equipment item && item.HasTag(CustomWeaponBehaviour.HandsFreeTag) && item.HasTag(CustomWeaponBehaviour.LanternTag) && item.IKType == Equipment.IKMode.Lantern)
+                            item.IKType = Equipment.IKMode.None;
                         return true;
                     }
 

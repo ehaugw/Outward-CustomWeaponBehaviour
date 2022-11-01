@@ -73,6 +73,18 @@ namespace CustomWeaponBehaviour
         }
     }
 
+    [HarmonyLib.HarmonyPatch(typeof(Weapon), "BaseImpact", MethodType.Getter)]
+    public class Weapon_BaseImpact
+    {
+        [HarmonyPostfix]
+        public static void Postfix(Weapon __instance, ref float __result)
+        {
+            CustomBehaviourFormulas.PostAmplifyWeaponImpact(ref __instance, ref __result);
+        }
+    }
+
+    
+
     //Gets the the damage of the weapon, excluding imbues
     [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetDamage")]
     public class Weapon_GetDamage
@@ -90,7 +102,7 @@ namespace CustomWeaponBehaviour
 
                 bool changed = false;
 
-                if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(__instance) || CustomWeaponBehaviour.Instance.holyBehaviour.IsHolyWeaponMode(__instance))
+                if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(__instance) || CustomWeaponBehaviour.Instance.holyBehaviour.IsHolyWeaponMode(__instance) || CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsMaulShoveMode(__instance))
                 {
                     changed = true;
                     __instance.Stats.Attacks[index].Damage = __instance.Damage.ToDamageArray().ToList();
@@ -110,6 +122,48 @@ namespace CustomWeaponBehaviour
             {
                 int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
                 __instance.Stats.Attacks[index].Damage = __state;
+
+            }
+        }
+    }
+
+    //Gets the the damage of the weapon, excluding imbues
+    [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetKnockback")]
+    public class Weapon_GetKnockback
+    {
+        [HarmonyPrefix]
+        public static void Prefix(Weapon __instance, int _attackID, out float? __state)
+        {
+            __state = null;
+
+            if (__instance.Stats?.Attacks != null)
+            {
+                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
+                var old = __instance.Stats.Attacks[index].Knockback;
+
+
+                bool changed = false;
+
+                if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(__instance) || CustomWeaponBehaviour.Instance.holyBehaviour.IsHolyWeaponMode(__instance) || CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsMaulShoveMode(__instance))
+                {
+                    changed = true;
+                    __instance.Stats.Attacks[index].Knockback = __instance.Impact;
+                }
+
+                if (changed)
+                {
+                    __state = old;
+                }
+            }
+        }
+
+        [HarmonyPostfix]
+        public static void Postfix(Weapon __instance, int _attackID, float? __state, ref float __result)
+        {
+            if (__state != null)
+            {
+                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
+                __instance.Stats.Attacks[index].Knockback = (float) __state;
 
             }
         }
