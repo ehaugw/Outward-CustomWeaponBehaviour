@@ -18,7 +18,7 @@
     public class CustomWeaponBehaviour : BaseUnityPlugin
     {
         public const string GUID = "com.ehaugw.customweaponbehaviour";
-        public const string VERSION = "2.2.0";
+        public const string VERSION = "3.0.0";
         public const string NAME = "Custom Weapon Behaviour";
         //2.2.0 changes:
         // parry window: 0.1 sec to 0.3 sec
