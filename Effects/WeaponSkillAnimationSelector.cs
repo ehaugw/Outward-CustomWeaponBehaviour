@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using TinyHelper;
 using UnityEngine;
 
 namespace CustomWeaponBehaviour
@@ -12,14 +13,10 @@ namespace CustomWeaponBehaviour
             CustomWeaponBehaviour.ChangeGrip(character, WeaponType);
         }
 
-        public static Boolean SetCustomAttackAnimation(Skill skill, Weapon.WeaponType weaponType/*, int millisecondDelay = 0*/)
+        public static void SetCustomAttackAnimation(Skill skill, Weapon.WeaponType weaponType/*, int millisecondDelay = 0*/)
         {
-            if (skill.transform.Find("ActivationEffects") is Transform activationEffects)
-            {
-                (activationEffects.gameObject.AddComponent<WeaponSkillAnimationSelector>()).WeaponType = weaponType;
-                return true;
-            }
-            return false;
+            var activationEffects = TinyGameObjectManager.MakeFreshObject("ActivationEffects", true, true, skill.transform).transform;
+            (activationEffects.gameObject.AddComponent<WeaponSkillAnimationSelector>()).WeaponType = weaponType;
         }
     }
 }
