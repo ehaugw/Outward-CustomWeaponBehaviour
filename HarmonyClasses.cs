@@ -48,127 +48,6 @@ namespace CustomWeaponBehaviour
         }
     }
 
-    
-    [HarmonyLib.HarmonyPatch(typeof(CharacterStats), "GetAmplifiedAttackSpeed")]
-    public class CharacterStats_GetAmplifiedAttackSpeed
-    {
-        [HarmonyPostfix]
-        public static void Postfix(CharacterStats __instance, ref float __result, ref Character ___m_character)
-        {
-            Weapon weapon = ___m_character?.CurrentWeapon;
-
-            if (weapon == null) return;
-
-            CustomBehaviourFormulas.PostAmplifySpeed(weapon, ref __result);
-        }
-    }
-
-    [HarmonyLib.HarmonyPatch(typeof(Weapon), "Damage", MethodType.Getter)]
-    public class Weapon_Damage
-    {
-        [HarmonyPostfix]
-        public static void Postfix(Weapon __instance, ref DamageList __result)
-        {
-            CustomBehaviourFormulas.PostAmplifyWeaponDamage(ref __instance, ref __result);
-        }
-    }
-
-    [HarmonyLib.HarmonyPatch(typeof(Weapon), "BaseImpact", MethodType.Getter)]
-    public class Weapon_BaseImpact
-    {
-        [HarmonyPostfix]
-        public static void Postfix(Weapon __instance, ref float __result)
-        {
-            CustomBehaviourFormulas.PostAmplifyWeaponImpact(ref __instance, ref __result);
-        }
-    }
-
-    
-
-    //Gets the the damage of the weapon, excluding imbues
-    [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetDamage")]
-    public class Weapon_GetDamage
-    {
-        [HarmonyPrefix]
-        public static void Prefix(Weapon __instance, int _attackID, out List<float> __state)
-        {
-            __state = null;
-
-            if (__instance.Stats?.Attacks != null)
-            {
-                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
-                var old = __instance.Stats.Attacks[index].Damage;
-
-
-                bool changed = false;
-
-                if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(__instance) || CustomWeaponBehaviour.Instance.holyBehaviour.IsHolyWeaponMode(__instance) || CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsMaulShoveMode(__instance))
-                {
-                    changed = true;
-                    __instance.Stats.Attacks[index].Damage = __instance.Damage.ToDamageArray().ToList();
-                }
-
-                if (changed)
-                {
-                    __state = old;
-                }
-            }
-        }
-
-        [HarmonyPostfix]
-        public static void Postfix(Weapon __instance, int _attackID, List<float> __state, ref DamageList __result)
-        {
-            if (__state != null)
-            {
-                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
-                __instance.Stats.Attacks[index].Damage = __state;
-
-            }
-        }
-    }
-
-    //Gets the the damage of the weapon, excluding imbues
-    [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetKnockback")]
-    public class Weapon_GetKnockback
-    {
-        [HarmonyPrefix]
-        public static void Prefix(Weapon __instance, int _attackID, out float? __state)
-        {
-            __state = null;
-
-            if (__instance.Stats?.Attacks != null)
-            {
-                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
-                var old = __instance.Stats.Attacks[index].Knockback;
-
-
-                bool changed = false;
-
-                if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(__instance) || CustomWeaponBehaviour.Instance.holyBehaviour.IsHolyWeaponMode(__instance) || CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsMaulShoveMode(__instance))
-                {
-                    changed = true;
-                    __instance.Stats.Attacks[index].Knockback = __instance.Impact;
-                }
-
-                if (changed)
-                {
-                    __state = old;
-                }
-            }
-        }
-
-        [HarmonyPostfix]
-        public static void Postfix(Weapon __instance, int _attackID, float? __state, ref float __result)
-        {
-            if (__state != null)
-            {
-                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
-                __instance.Stats.Attacks[index].Knockback = (float) __state;
-
-            }
-        }
-    }
-
     [HarmonyLib.HarmonyPatch(typeof(Character), "SendPerformAttackTrivial", new Type[] { typeof(int), typeof(int) })]
     public class Character_SendPerformAttackTrivial
     {
@@ -185,63 +64,6 @@ namespace CustomWeaponBehaviour
         //    //__instance.Animator.Play("HumanSkillAxeLeap_a");
         //}
     }
-
-    //public void Play(string stateName, [UnityEngine.Internal.DefaultValue("-1")] int layer, [UnityEngine.Internal.DefaultValue("float.NegativeInfinity")] float normalizedTime)
-
-    //[HarmonyLib.HarmonyPatch(typeof(Animator), "Play", new Type[] { typeof(string), typeof(int), typeof(float)})]
-    //public class Animator_Play
-    //{
-    //    [HarmonyPrefix]
-    //    public static void Prefix(Animator __instance, string stateName, int layer)
-    //    {
-    //    }
-    //}
-
-    //[HarmonyLib.HarmonyPatch(typeof(Animator), "Play", new Type[] { typeof(int), typeof(int)})]
-    //public class Animator_Play2
-    //{
-    //    [HarmonyPrefix]
-    //    public static void Prefix(Animator __instance, int stateNameHash, int layer)
-    //    {
-    //    }
-    //}
-
-    //[HarmonyLib.HarmonyPatch(typeof(Animator), "Play", new Type[] { typeof(int) })]
-    //public class Animator_Play3
-    //{
-    //    [HarmonyPrefix]
-    //    public static void Prefix(Animator __instance, int stateNameHash)
-    //    {
-    //    }
-    //}
-
-
-    //[HarmonyLib.HarmonyPatch(typeof(Character), "SpellCast")]
-    //public class Character_SpellCast
-    //{
-    //    [HarmonyPostfix]
-    //    public static void Postfix(Character __instance)
-    //    {
-    //    }
-    //}
-
-    //[HarmonyLib.HarmonyPatch(typeof(Character), "HitStarted")]
-    //public class Character_HitStarted
-    //{
-    //    [HarmonyPostfix]
-    //    public static void Postfix(Character __instance, ref int _attackID)
-    //    {
-    //        if (_attackID != -2)
-    //        {
-    //            if (BehaviourManager.SpellHasAttackAnimation(__instance))
-    //            {
-    //                //At.Call(__instance, "SpellCast", new object[] { });
-    //            }
-    //        }
-    //    }
-    //}
-
-    //public void ReceiveBlock(UnityEngine.MonoBehaviour hitBehaviour, float _damage, Vector3 _hitDir, float _angle, float _angleDir, Character _dealerChar, float _knockBack)
 
     [HarmonyLib.HarmonyPatch(typeof(Character), "ReceiveBlock", new Type[] { typeof(UnityEngine.MonoBehaviour), typeof(float), typeof(Vector3), typeof(float), typeof(float), typeof(Character), typeof(float) })]
     public class Character_ReceiveBlock
@@ -286,62 +108,6 @@ namespace CustomWeaponBehaviour
         }
     }
 
-
-
-    //Block related stuff. Not in use due to visual glitching.
-    //[HarmonyLib.HarmonyPatch(typeof(Character), "SendBlockStateTrivial", new Type[] { typeof(bool) })]
-    //public class Character_SendBlockStateTrivial
-    //{
-    //    [HarmonyPrefix]
-    //    public static void Prefix(Character __instance, ref bool _active)
-    //    {
-    //        BehaviourManager.AdaptGrip(__instance, 0, 0, BehaviourManager.AdaptGripType.Temporary);
-    //    }
-    //}
-
-
-
-    //[HarmonyLib.HarmonyPatch(typeof(Character), "StartBlocking")]
-    //public class Character_StartBlocking
-    //{
-    //    [HarmonyPrefix]
-    //    public static void Prefix(Character __instance)
-    //    {
-    //        if (!__instance.Blocking)
-    //        {
-    //            BehaviourManager.AdaptGrip(__instance, -1, -1, BehaviourManager.AdaptGripType.Permanent);
-    //        }
-    //    }
-    //}
-
-    //[HarmonyLib.HarmonyPatch(typeof(Character), "StopBlocking")]
-    //public class Character_StopBlocking
-    //{
-    //    [HarmonyPrefix]
-    //    public static void Prefix(Character __instance)
-    //    {
-    //        if (__instance.Blocking)
-    //        {
-    //            BehaviourManager.AdaptGrip(__instance, -1, -1, BehaviourManager.AdaptGripType.Reset);
-    //        }
-    //    }
-    //}
-
-
-    //[HarmonyLib.HarmonyPatch(typeof(Character), "NextAttack")] //Fix to light-heavy-heavy bug
-    //public class Character_NextAttack
-    //{
-    //    [HarmonyPrefix]
-    //    public static bool Prefix(Character __instance, ref int _type, ref int _id)
-    //    {
-    //        if (__instance.NextAttack1Only && _type != 0)
-    //        {
-    //            return false;
-    //        }
-    //        return true;
-    //    }
-    //}
-
     [HarmonyLib.HarmonyPatch(typeof(AttackSkill), "OwnerHasAllRequiredItems")]
     public class AttackSkill_OwnerHasAllRequiredItems
     {
@@ -370,6 +136,128 @@ namespace CustomWeaponBehaviour
         }
     }
 
+    [HarmonyLib.HarmonyPatch(typeof(CharacterStats), "GetAmplifiedAttackSpeed")]
+    public class CharacterStats_GetAmplifiedAttackSpeed
+    {
+        [HarmonyPostfix]
+        public static void Postfix(CharacterStats __instance, ref float __result, ref Character ___m_character)
+        {
+            Weapon weapon = ___m_character?.CurrentWeapon;
+
+            if (weapon == null) return;
+
+            CustomBehaviourFormulas.PostAmplifySpeed(weapon, ref __result);
+        }
+    }
+
+    [HarmonyLib.HarmonyPatch(typeof(Weapon), "Damage", MethodType.Getter)]
+    public class Weapon_Damage
+    {
+        [HarmonyPostfix]
+        public static void Postfix(Weapon __instance, ref DamageList __result)
+        {
+            CustomBehaviourFormulas.PostAmplifyWeaponDamage(ref __instance, ref __result);
+        }
+    }
+
+    //Wind Imbue Safe
+    [HarmonyLib.HarmonyPatch(typeof(Weapon), "BaseImpact", MethodType.Getter)]
+    public class Weapon_BaseImpact
+    {
+        [HarmonyPostfix]
+        public static void Postfix(Weapon __instance, ref float __result)
+        {
+            CustomBehaviourFormulas.PostAmplifyWeaponImpact(ref __instance, ref __result);
+        }
+    }
+
+    //Wind Imbue Safe
+    //Gets the the damage of the weapon, excluding imbues
+    [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetDamage")]
+    public class Weapon_GetDamage
+    {
+        [HarmonyPrefix]
+        public static void Prefix(Weapon __instance, int _attackID, out List<float> __state)
+        {
+            __state = null;
+
+            if (__instance.Stats?.Attacks != null)
+            {
+                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
+                var old = __instance.Stats.Attacks[index].Damage;
+
+
+                bool changed = false;
+
+                if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(__instance) || CustomWeaponBehaviour.Instance.holyBehaviour.IsHolyWeaponMode(__instance) || CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsMaulShoveMode(__instance))
+                {
+                    changed = true;
+                    __instance.Stats.Attacks[index].Damage = __instance.Damage.ToDamageArray().ToList();
+                }
+
+                if (changed)
+                {
+                    __state = old;
+                }
+            }
+        }
+
+        [HarmonyPostfix]
+        public static void Postfix(Weapon __instance, int _attackID, List<float> __state, ref DamageList __result)
+        {
+            if (__state != null)
+            {
+                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
+                __instance.Stats.Attacks[index].Damage = __state;
+
+            }
+        }
+    }
+
+    //Wind Imbue Safe
+    //Gets the the damage of the weapon, excluding imbues
+    [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetKnockback")]
+    public class Weapon_GetKnockback
+    {
+        [HarmonyPrefix]
+        public static void Prefix(Weapon __instance, int _attackID, out float? __state)
+        {
+            __state = null;
+
+            if (__instance.Stats?.Attacks != null)
+            {
+                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
+                var old = __instance.Stats.Attacks[index].Knockback;
+
+
+                bool changed = false;
+
+                if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(__instance) || CustomWeaponBehaviour.Instance.holyBehaviour.IsHolyWeaponMode(__instance) || CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsMaulShoveMode(__instance))
+                {
+                    changed = true;
+                    __instance.Stats.Attacks[index].Knockback = __instance.Impact;
+                }
+
+                if (changed)
+                {
+                    __state = old;
+                }
+            }
+        }
+
+        [HarmonyPostfix]
+        public static void Postfix(Weapon __instance, int _attackID, float? __state, ref float __result)
+        {
+            if (__state != null)
+            {
+                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
+                __instance.Stats.Attacks[index].Knockback = (float)__state;
+
+            }
+        }
+    }
+
+    //Wind Imbue Safe
     [HarmonyLib.HarmonyPatch(typeof(WeaponDamage), "BuildDamage", new Type[] { typeof(Character), typeof(DamageList), typeof(float) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Ref })]
     public class WeaponDamage_BuildDamage
     {
@@ -384,8 +272,7 @@ namespace CustomWeaponBehaviour
                     if (___m_attackSkill.RequiredWeaponTypes.Contains(bastardType) && !___m_attackSkill.RequiredWeaponTypes.Contains(_weapon.Type) && CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(_weapon))
                     {
                         __state = ___m_attackSkill.RequiredWeaponTypes;
-                        ___m_attackSkill.RequiredWeaponTypes = new List<Weapon.WeaponType>(__state);
-                        ___m_attackSkill.RequiredWeaponTypes.Add(_weapon.Type);
+                        ___m_attackSkill.RequiredWeaponTypes = new List<Weapon.WeaponType>(__state) { _weapon.Type };
                     }
                 }
             }
@@ -396,5 +283,4 @@ namespace CustomWeaponBehaviour
             if (__state != null && ___m_attackSkill != null) ___m_attackSkill.RequiredWeaponTypes = __state;
         }
     }
-
 }
