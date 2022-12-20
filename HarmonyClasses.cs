@@ -86,15 +86,26 @@ namespace CustomWeaponBehaviour
         [HarmonyPrefix]
         public static void Prefix(Character __instance, ref int _attackID)
         {
-            if (_attackID != -2)
+            if (_attackID != -2 && !__instance.IsCasting)
             {
                 CustomWeaponBehaviour.ResetGrip(__instance);
-
-                if (BehaviourManager.SpellHasAttackAnimation(__instance))
-                {
-                    At.Call(__instance, "CastDone", new object[] { });
-                }
             }
+
+            //OLD VERSION BUGGED WITH MULTI HIT SKILLS
+            //Debug.Log("hit ended for " + _attackID);
+            //Console.WriteLine("hit ended for " + _attackID);
+            ////skills that hit once has _attackID 0
+            ////chakram skill has 0 then -2
+            ////feral strikes has -1 twice
+            //if (_attackID != -2)
+            //{
+            //    CustomWeaponBehaviour.ResetGrip(__instance);
+
+            //    if (BehaviourManager.SpellHasAttackAnimation(__instance))
+            //    {
+            //        At.Call(__instance, "CastDone", new object[] { });
+            //    }
+            //}
         }
     }
 
