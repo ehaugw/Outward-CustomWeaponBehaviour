@@ -14,3 +14,5 @@ clean:
 	rm -f -r bin
 info:
 	echo Modname: $(modname)
+play:
+	(cd .. && make install && make play)
