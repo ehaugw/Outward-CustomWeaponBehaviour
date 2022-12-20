@@ -16,9 +16,11 @@ namespace CustomWeaponBehaviour
 
             CustomWeaponBehaviour.Instance.bastardBehaviour.BastardPostAmplifySpeed(ref weapon, ref result);
             CustomWeaponBehaviour.Instance.maulShoveBehaviour.MaulShovePostAmplifySpeed(ref weapon, ref result);
-            
+
             if (WeaponManager.Speeds.ContainsKey(weapon.Type) && WeaponManager.Speeds.ContainsKey(BehaviourManager.GetCurrentAnimationType(weapon)))
+            {
                 result *= WeaponManager.Speeds[BehaviourManager.GetCurrentAnimationType(weapon)] / WeaponManager.Speeds[weapon.Type];
+            }
         }
 
         public static void PostAmplifyWeaponDamage(ref Weapon _weapon, ref DamageList _damageList)
