@@ -23,7 +23,7 @@ namespace CustomWeaponBehaviour
             {
                 foreach (Effect effect in weapon.FirstImbue.ImbuedEffects)
                 {
-                    if (effect is WeaponDamage && ((WeaponDamage)effect).Damages[0].Type == this.GetHolyDamageType())
+                    if (effect is WeaponDamage weaponDamage && weaponDamage.Damages.Length > 0 && weaponDamage.Damages[0].Type == this.GetHolyDamageType())
                     {
                         return true;
                     }
