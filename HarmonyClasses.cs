@@ -71,11 +71,15 @@ namespace CustomWeaponBehaviour
         [HarmonyPrefix]
         public static void Prefix(Character __instance, Character _dealerChar, Vector3 _hitDir, ref float _knockBack)
         {
-            _knockBack /= 2;
-
             if (CustomWeaponBehaviour.Instance.parryBehaviour.DidSuccessfulParry(__instance.CurrentWeapon))
             {
-                CustomWeaponBehaviour.Instance.parryBehaviour.DeliverParry(__instance, _dealerChar, _hitDir, _knockBack);
+                _knockBack -= (__instance?.CurrentWeapon?.Impact ?? 0);
+                if (_knockBack < 0)
+                {
+                    _knockBack = 0;
+                }
+
+                CustomWeaponBehaviour.Instance.parryBehaviour.DeliverParry(__instance, _dealerChar, _hitDir, (__instance?.CurrentWeapon?.Impact ?? 0));
             }
         }
     }
