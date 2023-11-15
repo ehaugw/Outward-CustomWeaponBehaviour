@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+//using SideLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -124,7 +125,7 @@ namespace CustomWeaponBehaviour
     }
 
     [HarmonyLib.HarmonyPatch(typeof(AttackSkill), "OwnerHasAllRequiredItems")]
-    public class AttackSkill_OwnerHasAllRequiredItems
+    public class AttackSkill_OwnerHasAllRequiredItemsMainHand
     {
         [HarmonyPrefix]
         public static void Prefix(AttackSkill __instance, out List<Weapon.WeaponType> __state)
@@ -133,9 +134,9 @@ namespace CustomWeaponBehaviour
 
             if (__instance?.OwnerCharacter?.CurrentWeapon is Weapon _weapon)
             {
-                if (__instance.RequiredWeaponTypes != null && BastardBehaviour.GetBastardType(_weapon.Type) is Weapon.WeaponType bastardType)
+                if (__instance.RequiredWeaponTypes != null)
                 {
-                    if (__instance.RequiredWeaponTypes.Contains(bastardType) && !__instance.RequiredWeaponTypes.Contains(_weapon.Type) && CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(_weapon))
+                    if (BastardBehaviour.GetBastardType(_weapon.Type) is Weapon.WeaponType bastardType && __instance.RequiredWeaponTypes.Contains(bastardType) && !__instance.RequiredWeaponTypes.Contains(_weapon.Type) && CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(_weapon))
                     {
                         __state = __instance.RequiredWeaponTypes;
                         __instance.RequiredWeaponTypes = new List<Weapon.WeaponType>(__state);
@@ -148,6 +149,92 @@ namespace CustomWeaponBehaviour
         public static void Postfix(AttackSkill __instance, List<Weapon.WeaponType> __state)
         {
             if (__state != null) __instance.RequiredWeaponTypes = __state;
+        }
+    }
+
+    [HarmonyLib.HarmonyPatch(typeof(AttackSkill), "OwnerHasAllRequiredItems")]
+    public class AttackSkill_OwnerHasAllRequiredItemsOffHand
+    {
+        [HarmonyPrefix]
+        public static void Prefix(AttackSkill __instance, out Tuple<List<Weapon.WeaponType>, Equipment> __state)
+        {
+            __state = null;
+            if (__instance?.OwnerCharacter is Character character && character.LeftHandWeapon is Weapon _weapon)
+            {
+                if (__instance.RequiredOffHandTypes != null)
+                {
+                    if (__instance.RequiredOffHandTypes.Contains(Weapon.WeaponType.Dagger_OH) && _weapon.HasTag(CustomWeaponBehaviour.PointyTag))
+                    {
+                        __state = new Tuple<List<Weapon.WeaponType>, Equipment>(__instance.RequiredOffHandTypes, character.LeftHandWeapon ?? null);
+
+                        __instance.RequiredOffHandTypes = new List<Weapon.WeaponType>(__state.Item1);
+                        __instance.RequiredOffHandTypes.Add(_weapon.Type);
+
+                        At.SetValue(_weapon, typeof(Character), character, "m_leftHandEquipment");
+
+                    }
+                }
+            }
+        }
+
+        public static void Postfix(AttackSkill __instance, Tuple<List<Weapon.WeaponType>, Equipment> __state)
+        {
+            if (__state != null)
+            {
+                __instance.RequiredOffHandTypes = __state.Item1;
+                At.SetValue(__state.Item2, typeof(Character), __instance?.OwnerCharacter, "m_leftHandEquipment");
+
+            }
+        }
+    }
+
+    //[HarmonyLib.HarmonyPatch(typeof(Character), "LeftHandWeapon", MethodType.Getter)]
+    //public class Character_LeftHandWeapon
+    //{
+    //    [HarmonyPostfix]
+    //    public static void Postfix(Character __instance, ref Weapon __result)
+    //    {
+    //        if (__result == null && __instance?.CurrentWeapon?.Type == Weapon.WeaponType.FistW_2H)
+    //        {
+    //            __result = __instance.CurrentWeapon;
+    //        }
+    //    }
+    //}
+    
+    //enables, but doesnt hit
+    [HarmonyLib.HarmonyPatch(typeof(AttackSkill), "OwnerHasAllRequiredItems")]
+    public class AttackSkill_OwnerHasAllRequiredItemsFist
+    {
+        [HarmonyPrefix]
+        public static void Prefix(AttackSkill __instance, out Tuple<List<Weapon.WeaponType>, Equipment> __state)
+        {
+            __state = null;
+            if (__instance?.OwnerCharacter is Character character && character.CurrentWeapon is Weapon _weapon)
+            {
+                if (__instance.RequiredOffHandTypes != null)
+                {
+                    if (__instance.RequiredOffHandTypes.Contains(Weapon.WeaponType.Dagger_OH) && _weapon.HasTag(CustomWeaponBehaviour.PointyTag))
+                    {
+                        __state = new Tuple<List<Weapon.WeaponType>, Equipment>(__instance.RequiredOffHandTypes, character.LeftHandWeapon ?? null);
+
+                        __instance.RequiredOffHandTypes = new List<Weapon.WeaponType>(__state.Item1);
+                        __instance.RequiredOffHandTypes.Add(_weapon.Type);
+
+                        At.SetValue(_weapon, typeof(Character), character, "m_leftHandEquipment");
+
+                    }
+                }
+            }
+        }
+
+        public static void Postfix(AttackSkill __instance, Tuple<List<Weapon.WeaponType>, Equipment> __state)
+        {
+            if (__state != null)
+            {
+                __instance.RequiredOffHandTypes = __state.Item1;
+                At.SetValue(__state.Item2, typeof(Character), __instance?.OwnerCharacter, "m_leftHandEquipment");
+
+            }
         }
     }
 

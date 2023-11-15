@@ -18,7 +18,7 @@
     public class CustomWeaponBehaviour : BaseUnityPlugin
     {
         public const string GUID = "com.ehaugw.customweaponbehaviour";
-        public const string VERSION = "3.0.0";
+        public const string VERSION = "3.0.1";
         public const string NAME = "Custom Weapon Behaviour";
         public static CustomWeaponBehaviour Instance;
         public static Tag BastardTag;
@@ -32,6 +32,7 @@
         public static Tag HandsFreeTag;
         public static Tag LanternTag;
         public static Tag MaulShoveTag;
+        public static Tag PointyTag;
 
         public BastardBehaviour bastardBehaviour = new BastardBehaviour();
         public MaulShoveBehaviour maulShoveBehaviour = new MaulShoveBehaviour();
@@ -67,6 +68,7 @@
             string prefix = "";
 
             foreach (var tup in new List<Tuple<Tag, string>> {
+                new Tuple<Tag, string>(CustomWeaponBehaviour.PointyTag, "Pointy"),
                 new Tuple<Tag, string>(CustomWeaponBehaviour.BastardTag, "Bastard"),
                 new Tuple<Tag, string>(CustomWeaponBehaviour.FinesseTag, "Finesse"),
                 new Tuple<Tag, string>(CustomWeaponBehaviour.HolyWeaponTag, "Holy"),
@@ -87,6 +89,7 @@
 
         private void BeforePacksLoaded()
         {
+            PointyTag = TinyTagManager.GetOrMakeTag(IDs.PointyTag);
             BastardTag = TinyTagManager.GetOrMakeTag(IDs.BastardTag);
             FinesseTag = TinyTagManager.GetOrMakeTag(IDs.FinesseTag);
             HolyWeaponTag = TinyTagManager.GetOrMakeTag(IDs.HolyTag);
