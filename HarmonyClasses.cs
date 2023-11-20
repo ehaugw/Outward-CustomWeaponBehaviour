@@ -49,6 +49,7 @@ namespace CustomWeaponBehaviour
         }
     }
 
+    //INITIATE CUSTOM MOVESET
     [HarmonyLib.HarmonyPatch(typeof(Character), "SendPerformAttackTrivial", new Type[] { typeof(int), typeof(int) })]
     public class Character_SendPerformAttackTrivial
     {
@@ -57,15 +58,34 @@ namespace CustomWeaponBehaviour
         {
             BehaviourManager.AdaptGrip(__instance, ref _type, ref _id);
         }
-
-        //[HarmonyPostfix]
-        //public static void Postfix(Character __instance)
-        //{
-        //    __instance.SendMessage("PerformAttack", SendMessageOptions.DontRequireReceiver);
-        //    //__instance.Animator.Play("HumanSkillAxeLeap_a");
-        //}
     }
 
+    //TERMINATE CUSTOM MOVESET
+    [HarmonyLib.HarmonyPatch(typeof(Character), "HitEnded")]
+    public class Character_HitEnded
+    {
+        [HarmonyPrefix]
+        public static void Prefix(Character __instance, ref int _attackID)
+        {
+            if (_attackID != -2 && !__instance.IsCasting)
+            {
+                CustomWeaponBehaviour.ResetGrip(__instance);
+            }
+        }
+    }
+
+    //TERMINATE CUSTOM MOVESET
+    [HarmonyLib.HarmonyPatch(typeof(Character), "StopLocomotionAction")]
+    public class Character_StopLocomotionAction
+    {
+        [HarmonyPrefix]
+        public static void Prefix(Character __instance)
+        {
+            CustomWeaponBehaviour.ResetGrip(__instance);
+        }
+    }
+
+    //PARRY
     [HarmonyLib.HarmonyPatch(typeof(Character), "ReceiveBlock", new Type[] { typeof(UnityEngine.MonoBehaviour), typeof(float), typeof(Vector3), typeof(float), typeof(float), typeof(Character), typeof(float) })]
     public class Character_ReceiveBlock
     {
@@ -79,51 +99,12 @@ namespace CustomWeaponBehaviour
                 {
                     _knockBack = 0;
                 }
-
                 CustomWeaponBehaviour.Instance.parryBehaviour.DeliverParry(__instance, _dealerChar, _hitDir, (__instance?.CurrentWeapon?.Impact ?? 0));
             }
         }
     }
 
-    [HarmonyLib.HarmonyPatch(typeof(Character), "HitEnded")]
-    public class Character_HitEnded
-    {
-        [HarmonyPrefix]
-        public static void Prefix(Character __instance, ref int _attackID)
-        {
-            if (_attackID != -2 && !__instance.IsCasting)
-            {
-                CustomWeaponBehaviour.ResetGrip(__instance);
-            }
-
-            //OLD VERSION BUGGED WITH MULTI HIT SKILLS
-            //Debug.Log("hit ended for " + _attackID);
-            //Console.WriteLine("hit ended for " + _attackID);
-            ////skills that hit once has _attackID 0
-            ////chakram skill has 0 then -2
-            ////feral strikes has -1 twice
-            //if (_attackID != -2)
-            //{
-            //    CustomWeaponBehaviour.ResetGrip(__instance);
-
-            //    if (BehaviourManager.SpellHasAttackAnimation(__instance))
-            //    {
-            //        At.Call(__instance, "CastDone", new object[] { });
-            //    }
-            //}
-        }
-    }
-
-    [HarmonyLib.HarmonyPatch(typeof(Character), "StopLocomotionAction")]
-    public class Character_StopLocomotionAction
-    {
-        [HarmonyPrefix]
-        public static void Prefix(Character __instance)
-        {
-            CustomWeaponBehaviour.ResetGrip(__instance);
-        }
-    }
-
+    //ENABLE MAIN HANDS TO COUNT AS OTHER TYPES FOR SKILLS
     [HarmonyLib.HarmonyPatch(typeof(AttackSkill), "OwnerHasAllRequiredItems")]
     public class AttackSkill_OwnerHasAllRequiredItemsMainHand
     {
@@ -152,6 +133,7 @@ namespace CustomWeaponBehaviour
         }
     }
 
+    //ENABLE OFF HANDS TO COUNT AS OTHER TYPES FOR SKILLS
     [HarmonyLib.HarmonyPatch(typeof(AttackSkill), "OwnerHasAllRequiredItems")]
     public class AttackSkill_OwnerHasAllRequiredItemsOffHand
     {
@@ -188,6 +170,33 @@ namespace CustomWeaponBehaviour
         }
     }
 
+    //DOES NOT CHANGE DAMAGE, ONLY ENABLES THE SKILL TO BUILD DAMAGE FOR A CUSTOM WEAPON TYPE
+    [HarmonyLib.HarmonyPatch(typeof(WeaponDamage), "BuildDamage", new Type[] { typeof(Character), typeof(DamageList), typeof(float) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Ref })]
+    public class WeaponDamage_BuildDamage
+    {
+        [HarmonyPrefix]
+        public static void Prefix(WeaponDamage __instance, ref AttackSkill ___m_attackSkill, out List<Weapon.WeaponType> __state)
+        {
+            __state = null;
+            if (___m_attackSkill?.OwnerCharacter?.CurrentWeapon is Weapon _weapon)
+            {
+                if (___m_attackSkill.RequiredWeaponTypes != null && BastardBehaviour.GetBastardType(_weapon.Type) is Weapon.WeaponType bastardType)
+                {
+                    if (___m_attackSkill.RequiredWeaponTypes.Contains(bastardType) && !___m_attackSkill.RequiredWeaponTypes.Contains(_weapon.Type) && CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(_weapon))
+                    {
+                        __state = ___m_attackSkill.RequiredWeaponTypes;
+                        ___m_attackSkill.RequiredWeaponTypes = new List<Weapon.WeaponType>(__state) { _weapon.Type };
+                    }
+                }
+            }
+        }
+
+        public static void Postfix(AttackSkill ___m_attackSkill, List<Weapon.WeaponType> __state)
+        {
+            if (__state != null && ___m_attackSkill != null) ___m_attackSkill.RequiredWeaponTypes = __state;
+        }
+    }
+
     //[HarmonyLib.HarmonyPatch(typeof(Character), "LeftHandWeapon", MethodType.Getter)]
     //public class Character_LeftHandWeapon
     //{
@@ -200,8 +209,9 @@ namespace CustomWeaponBehaviour
     //        }
     //    }
     //}
-    
-    //enables, but doesnt hit
+
+
+    //WIP FOR ENABLING FISTS TO BE USED WITH DAGGER SKILLS
     [HarmonyLib.HarmonyPatch(typeof(AttackSkill), "OwnerHasAllRequiredItems")]
     public class AttackSkill_OwnerHasAllRequiredItemsFist
     {
@@ -238,6 +248,9 @@ namespace CustomWeaponBehaviour
         }
     }
 
+    //EXHAUSTIVELY USED FOR CUSTOM MOVESET SPEEDS.
+    //WORKS AS INTENDED, BUT MAY BE SCALED INCORRECTLY BEWTWEEN SPECIAL ATTACK SPEEDS.
+    //TODO: INVESTIGATE DIFFERENTIATING BETWEEN ATTACK ID 0-4 SPEEDS
     [HarmonyLib.HarmonyPatch(typeof(CharacterStats), "GetAmplifiedAttackSpeed")]
     public class CharacterStats_GetAmplifiedAttackSpeed
     {
@@ -252,7 +265,8 @@ namespace CustomWeaponBehaviour
         }
     }
 
-    [HarmonyLib.HarmonyPatch(typeof(Weapon), "Damage", MethodType.Getter)]
+    //ALTERNATE WEAPON DAMAMAGE AT THE MOST BASIC LEVEL
+    [HarmonyLib.HarmonyPatch(typeof(Weapon), nameof(Weapon.Damage), MethodType.Getter)]
     public class Weapon_Damage
     {
         [HarmonyPostfix]
@@ -262,19 +276,7 @@ namespace CustomWeaponBehaviour
         }
     }
 
-    //Wind Imbue Safe
-    [HarmonyLib.HarmonyPatch(typeof(Weapon), "BaseImpact", MethodType.Getter)]
-    public class Weapon_BaseImpact
-    {
-        [HarmonyPostfix]
-        public static void Postfix(Weapon __instance, ref float __result)
-        {
-            CustomBehaviourFormulas.PostAmplifyWeaponImpact(ref __instance, ref __result);
-        }
-    }
-
-    //Wind Imbue Safe
-    //Gets the the damage of the weapon, excluding imbues
+    //FORCES GetDamage TO USE AN AMPLIFIED Weapon.Damage OF THE SPECIFIC ATTACK ID, BUT DOES NOT CHANGE DAMAGE. DAMAGE CHANGE IS DONE IN Weapon_Damage
     [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetDamage")]
     public class Weapon_GetDamage
     {
@@ -305,7 +307,7 @@ namespace CustomWeaponBehaviour
         }
 
         [HarmonyPostfix]
-        public static void Postfix(Weapon __instance, int _attackID, List<float> __state, ref DamageList __result)
+        public static void Postfix(Weapon __instance, int _attackID, List<float> __state) // ref DamageList __result
         {
             if (__state != null)
             {
@@ -316,8 +318,18 @@ namespace CustomWeaponBehaviour
         }
     }
 
-    //Wind Imbue Safe
-    //Gets the the damage of the weapon, excluding imbues
+    //MANIPULATE IMPACT AT THE MOST BASIC LEVEL
+    [HarmonyLib.HarmonyPatch(typeof(Weapon), "BaseImpact", MethodType.Getter)]
+    public class Weapon_BaseImpact
+    {
+        [HarmonyPostfix]
+        public static void Postfix(Weapon __instance, ref float __result)
+        {
+            CustomBehaviourFormulas.PostAmplifyWeaponImpact(ref __instance, ref __result);
+        }
+    }
+
+    //FORCES GetKnockback TO USE AN AMPLIFIED Weapon.BaseImpact OF THE SPECIFIC ATTACK ID, BUT DOES NOT CHANGE DAMAGE. DAMAGE CHANGE IS DONE IN Weapon_BaseImpact
     [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetKnockback")]
     public class Weapon_GetKnockback
     {
@@ -356,33 +368,6 @@ namespace CustomWeaponBehaviour
                 __instance.Stats.Attacks[index].Knockback = (float)__state;
 
             }
-        }
-    }
-
-    //Wind Imbue Safe
-    [HarmonyLib.HarmonyPatch(typeof(WeaponDamage), "BuildDamage", new Type[] { typeof(Character), typeof(DamageList), typeof(float) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Ref })]
-    public class WeaponDamage_BuildDamage
-    {
-        [HarmonyPrefix]
-        public static void Prefix(WeaponDamage __instance, ref AttackSkill ___m_attackSkill, out List<Weapon.WeaponType> __state)
-        {
-            __state = null;
-            if (___m_attackSkill?.OwnerCharacter?.CurrentWeapon is Weapon _weapon)
-            {
-                if (___m_attackSkill.RequiredWeaponTypes != null && BastardBehaviour.GetBastardType(_weapon.Type) is Weapon.WeaponType bastardType)
-                {
-                    if (___m_attackSkill.RequiredWeaponTypes.Contains(bastardType) && !___m_attackSkill.RequiredWeaponTypes.Contains(_weapon.Type) && CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(_weapon))
-                    {
-                        __state = ___m_attackSkill.RequiredWeaponTypes;
-                        ___m_attackSkill.RequiredWeaponTypes = new List<Weapon.WeaponType>(__state) { _weapon.Type };
-                    }
-                }
-            }
-        }
-
-        public static void Postfix(AttackSkill ___m_attackSkill, List<Weapon.WeaponType> __state)
-        {
-            if (__state != null && ___m_attackSkill != null) ___m_attackSkill.RequiredWeaponTypes = __state;
         }
     }
 }
