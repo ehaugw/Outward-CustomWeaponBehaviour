@@ -196,21 +196,7 @@ namespace CustomWeaponBehaviour
             if (__state != null && ___m_attackSkill != null) ___m_attackSkill.RequiredWeaponTypes = __state;
         }
     }
-
-    //[HarmonyLib.HarmonyPatch(typeof(Character), "LeftHandWeapon", MethodType.Getter)]
-    //public class Character_LeftHandWeapon
-    //{
-    //    [HarmonyPostfix]
-    //    public static void Postfix(Character __instance, ref Weapon __result)
-    //    {
-    //        if (__result == null && __instance?.CurrentWeapon?.Type == Weapon.WeaponType.FistW_2H)
-    //        {
-    //            __result = __instance.CurrentWeapon;
-    //        }
-    //    }
-    //}
-
-
+    
     //WIP FOR ENABLING FISTS TO BE USED WITH DAGGER SKILLS
     [HarmonyLib.HarmonyPatch(typeof(AttackSkill), "OwnerHasAllRequiredItems")]
     public class AttackSkill_OwnerHasAllRequiredItemsFist
@@ -276,7 +262,7 @@ namespace CustomWeaponBehaviour
         }
     }
 
-    //FORCES GetDamage TO USE AN AMPLIFIED Weapon.Damage OF THE SPECIFIC ATTACK ID, BUT DOES NOT CHANGE DAMAGE. DAMAGE CHANGE IS DONE IN Weapon_Damage
+    //FORCES GetDamage TO UPDATED STATS FOR THE SPECIFIC ATTACK ID, BUT DOES NOT CHANGE DAMAGE. DAMAGE CHANGE IS DONE IN Weapon_Damage
     [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetDamage")]
     public class Weapon_GetDamage
     {
@@ -329,7 +315,7 @@ namespace CustomWeaponBehaviour
         }
     }
 
-    //FORCES GetKnockback TO USE AN AMPLIFIED Weapon.BaseImpact OF THE SPECIFIC ATTACK ID, BUT DOES NOT CHANGE DAMAGE. DAMAGE CHANGE IS DONE IN Weapon_BaseImpact
+    //FORCES GetKnockback TO USE UPDATED STATS FOR THE SPECIFIC ATTACK ID, BUT DOES NOT CHANGE DAMAGE. DAMAGE CHANGE IS DONE IN Weapon_BaseImpact
     [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetKnockback")]
     public class Weapon_GetKnockback
     {

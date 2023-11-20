@@ -26,7 +26,7 @@ namespace CustomWeaponBehaviour
         public virtual float GetBastardSpeedBonus(Weapon weapon)
         {
             float modifier = 0;
-            foreach (var modObj in CustomWeaponBehaviour.BastardModifiers)
+            foreach (var modObj in CustomWeaponBehaviour.IBastardModifiers)
             {
                 modObj.ApplySpeedModifier(weapon, ref modifier);
             }
@@ -36,7 +36,7 @@ namespace CustomWeaponBehaviour
         public virtual float GetBastardDamageBonus(Weapon weapon)
         {
             float modifier = 1;
-            foreach (var modObj in CustomWeaponBehaviour.BastardModifiers)
+            foreach (var modObj in CustomWeaponBehaviour.IBastardModifiers)
             {
                 modObj.ApplyDamageModifier(weapon, ref modifier);
             }
@@ -45,7 +45,7 @@ namespace CustomWeaponBehaviour
         public virtual float GetBastardImpactBonus(Weapon weapon)
         {
             float modifier = 1;
-            foreach (var modObj in CustomWeaponBehaviour.BastardModifiers)
+            foreach (var modObj in CustomWeaponBehaviour.IBastardModifiers)
             {
                 modObj.ApplyImpactModifier(weapon, ref modifier);
             }

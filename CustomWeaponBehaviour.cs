@@ -18,7 +18,7 @@
     public class CustomWeaponBehaviour : BaseUnityPlugin
     {
         public const string GUID = "com.ehaugw.customweaponbehaviour";
-        public const string VERSION = "3.0.1";
+        public const string VERSION = "3.0.2";
         public const string NAME = "Custom Weapon Behaviour";
         public static CustomWeaponBehaviour Instance;
         public static Tag BastardTag;
@@ -44,15 +44,16 @@
         public AttackCancelByBlockBehaviour attackCancelByBlockBehaviour = new AttackCancelByBlockBehaviour();
         public AttackCancelBySkillBehaviour attackCancelBySkillBehaviour = new AttackCancelBySkillBehaviour();
 
-        public static List<BastardModifier> BastardModifiers = new List<BastardModifier>();
-        public static List<MaulShoveModifier> MaulShoveModifiers = new List<MaulShoveModifier>();
+        public static List<IBastardModifier> IBastardModifiers = new List<IBastardModifier>();
+        public static List<IMaulShoveModifier> IMaulShoveModifiers = new List<IMaulShoveModifier>();
+        public static List<IBaseDamageModifier> IBaseDamageModifiers = new List<IBaseDamageModifier>();
 
 
 
         internal void Awake()
         {
-            BastardModifiers.Add(new BastardModifier());
-            MaulShoveModifiers.Add(new MaulShoveModifier());
+            IBastardModifiers.Add(new BastardModifier());
+            IMaulShoveModifiers.Add(new MaulShoveModifier());
 
             Instance = this;
             var harmony = new Harmony(GUID);

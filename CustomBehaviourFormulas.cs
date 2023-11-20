@@ -25,7 +25,16 @@ namespace CustomWeaponBehaviour
 
         public static void PostAmplifyWeaponDamage(ref Weapon _weapon, ref DamageList _damageList)
         {
+            var oldDamage = _damageList;
             _damageList = _damageList.Clone();
+
+            foreach (var baseDamageModifier in CustomWeaponBehaviour.IBaseDamageModifiers)
+            {
+                if (baseDamageModifier.Eligible(_weapon))
+                {
+                    baseDamageModifier.Apply(_weapon, oldDamage, ref _damageList);
+                }
+            }
 
             CustomWeaponBehaviour.Instance.maulShoveBehaviour.MaulShovePostAmplifyWeaponDamage(ref _weapon, ref _damageList);
             CustomWeaponBehaviour.Instance.bastardBehaviour.BastardPostAmplifyWeaponDamage(ref _weapon, ref _damageList);

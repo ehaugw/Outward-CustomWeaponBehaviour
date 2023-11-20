@@ -11,7 +11,7 @@ namespace CustomWeaponBehaviour
         public virtual float GetMaulShoveSpeedBonus(Weapon weapon)
         {
             float modifier = 0;
-            foreach (var modObj in CustomWeaponBehaviour.MaulShoveModifiers)
+            foreach (var modObj in CustomWeaponBehaviour.IMaulShoveModifiers)
             {
                 modObj.ApplySpeedModifier(weapon, ref modifier);
             }
@@ -21,7 +21,7 @@ namespace CustomWeaponBehaviour
         public virtual float GetMaulShoveDamageBonus(Weapon weapon)
         {
             float modifier = 1;
-            foreach (var modObj in CustomWeaponBehaviour.MaulShoveModifiers)
+            foreach (var modObj in CustomWeaponBehaviour.IMaulShoveModifiers)
             {
                 modObj.ApplyDamageModifier(weapon, ref modifier);
             }
@@ -31,7 +31,7 @@ namespace CustomWeaponBehaviour
         public virtual float GetMaulShoveImpactBonus(Weapon weapon)
         {
             float modifier = 1;
-            foreach (var modObj in CustomWeaponBehaviour.MaulShoveModifiers)
+            foreach (var modObj in CustomWeaponBehaviour.IMaulShoveModifiers)
             {
                 modObj.ApplyImpactModifier(weapon, ref modifier);
             }

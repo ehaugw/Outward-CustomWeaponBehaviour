@@ -48,6 +48,9 @@
     <Compile Include="BehaviourClasses\HolyBehaviour.cs" />
     <Compile Include="BehaviourClasses\FinesseBehaviour.cs" />
     <Compile Include="BehaviourManager.cs" />
+    <Compile Include="ModifierClasses\IBaseDamageModifier.cs" />
+    <Compile Include="ModifierClasses\IBastardModifier.cs" />
+    <Compile Include="ModifierClasses\IMaulShoveModifier.cs" />
     <Compile Include="RND.cs" />
     <Compile Include="CustomBehaviourFormulas.cs" />
     <Compile Include="Effects\EnableHitDetection.cs" />

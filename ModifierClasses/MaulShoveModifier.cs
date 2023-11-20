@@ -5,14 +5,14 @@ using System.Text;
 
 namespace CustomWeaponBehaviour
 {
-    public class MaulShoveModifier
+    public class MaulShoveModifier : IMaulShoveModifier
     {
-        public virtual void ApplyDamageModifier(Weapon weapon, ref float modifier)
+        public void ApplyDamageModifier(Weapon weapon, ref float modifier)
         {
             modifier -= 0.25f;
         }
 
-        public virtual void ApplyImpactModifier(Weapon weapon, ref float modifier)
+        public void ApplyImpactModifier(Weapon weapon, ref float modifier)
         {
             switch (weapon.Type)
             {
@@ -27,7 +27,7 @@ namespace CustomWeaponBehaviour
             }
         }
 
-        public virtual void ApplySpeedModifier(Weapon weapon, ref float modifier)
+        public void ApplySpeedModifier(Weapon weapon, ref float modifier)
         {
             modifier -= 0.2f;
         }
