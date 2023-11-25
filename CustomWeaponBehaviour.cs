@@ -18,7 +18,7 @@
     public class CustomWeaponBehaviour : BaseUnityPlugin
     {
         public const string GUID = "com.ehaugw.customweaponbehaviour";
-        public const string VERSION = "3.0.2";
+        public const string VERSION = "3.1.0";
         public const string NAME = "Custom Weapon Behaviour";
         public static CustomWeaponBehaviour Instance;
         public static Tag BastardTag;
@@ -47,8 +47,6 @@
         public static List<IBastardModifier> IBastardModifiers = new List<IBastardModifier>();
         public static List<IMaulShoveModifier> IMaulShoveModifiers = new List<IMaulShoveModifier>();
         public static List<IBaseDamageModifier> IBaseDamageModifiers = new List<IBaseDamageModifier>();
-
-
 
         internal void Awake()
         {
@@ -106,11 +104,6 @@
 
         private void OnPacksLoaded()
         {
-            //var oldLantern = ResourcesPrefabManager.Instance.GetItemPrefab(IDs.oldLanternID) as Skill;
-            //CustomItems.SetItemTags(oldLantern, new string[] { IDs.HandsFreeTag }, false);
-            //TagSourceSelector[] tagSelectorList = oldLantern.Tags.Select(x => new TagSourceSelector(x)).AddItem(new TagSourceSelector(HandsFreeTag)).ToArray();
-            //new TagSourceSelector[] { new TagSourceSelector(HandsFreeTag) };
-            //oldLantern. = tagSelectorList;
         }
 
         public static void ChangeGrip(Character character, Weapon.WeaponType toMoveset)

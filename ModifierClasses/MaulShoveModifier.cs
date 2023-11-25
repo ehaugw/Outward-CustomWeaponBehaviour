@@ -7,12 +7,12 @@ namespace CustomWeaponBehaviour
 {
     public class MaulShoveModifier : IMaulShoveModifier
     {
-        public void ApplyDamageModifier(Weapon weapon, ref float modifier)
+        public void ApplyDamageModifier(Weapon weapon, DamageList original, ref DamageList result)
         {
-            modifier -= 0.25f;
+            result += original * -0.25f;
         }
 
-        public void ApplyImpactModifier(Weapon weapon, ref float modifier)
+        public void ApplyImpactModifier(Weapon weapon, float original, ref float result)
         {
             switch (weapon.Type)
             {
@@ -20,16 +20,20 @@ namespace CustomWeaponBehaviour
                 case Weapon.WeaponType.Sword_2H:
                 case Weapon.WeaponType.Axe_1H:
                 case Weapon.WeaponType.Axe_2H:
-                    modifier += 2f;
+                    result += original * 2f;
+                    break;
+                case Weapon.WeaponType.Mace_1H:
+                case Weapon.WeaponType.Mace_2H:
+                    result += original * 0.5f;
                     break;
                 default:
                     break;
             }
         }
 
-        public void ApplySpeedModifier(Weapon weapon, ref float modifier)
+        public void ApplySpeedModifier(Weapon weapon, float original, ref float result)
         {
-            modifier -= 0.2f;
+            result += original * -0.2f;
         }
     }
 }

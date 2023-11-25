@@ -37,7 +37,7 @@ namespace CustomWeaponBehaviour
             return weapon.HasTag(CustomWeaponBehaviour.HolyWeaponTag);
         }
 
-        public void HolyPostAmplifyWeaponDamage(ref Weapon _weapon, ref DamageList _damageList)
+        public void PostAffectDamage(ref Weapon _weapon, DamageList original, ref DamageList _damageList)
         {
             if (this.IsHolyWeaponMode(_weapon))
             {

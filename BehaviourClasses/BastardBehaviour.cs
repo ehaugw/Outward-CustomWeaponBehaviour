@@ -23,35 +23,6 @@ namespace CustomWeaponBehaviour
             }
         }
 
-        public virtual float GetBastardSpeedBonus(Weapon weapon)
-        {
-            float modifier = 0;
-            foreach (var modObj in CustomWeaponBehaviour.IBastardModifiers)
-            {
-                modObj.ApplySpeedModifier(weapon, ref modifier);
-            }
-            return modifier;
-        }
-        
-        public virtual float GetBastardDamageBonus(Weapon weapon)
-        {
-            float modifier = 1;
-            foreach (var modObj in CustomWeaponBehaviour.IBastardModifiers)
-            {
-                modObj.ApplyDamageModifier(weapon, ref modifier);
-            }
-            return modifier;
-        }
-        public virtual float GetBastardImpactBonus(Weapon weapon)
-        {
-            float modifier = 1;
-            foreach (var modObj in CustomWeaponBehaviour.IBastardModifiers)
-            {
-                modObj.ApplyImpactModifier(weapon, ref modifier);
-            }
-            return modifier;
-        }
-
         public virtual bool Eligible(Weapon weapon)
         {
             return weapon.HasTag(CustomWeaponBehaviour.BastardTag) && !weapon.TwoHanded;
@@ -66,26 +37,47 @@ namespace CustomWeaponBehaviour
                 ) && !CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsActive(weapon);
         }
 
-        public void BastardPostAmplifyWeaponDamage(ref Weapon weapon, ref DamageList _damageList)
+        public void PostAffectDamage(ref Weapon weapon, DamageList original, ref DamageList result)
         {
             if (this.IsBastardMode(weapon))
             {
-                _damageList *= this.GetBastardDamageBonus(weapon);
-            }
-        }
-        public void BastardPostAmplifyWeaponImpact(ref Weapon weapon, ref float _impactDamage)
-        {
-            if (this.IsBastardMode(weapon))
-            {
-                _impactDamage *= this.GetBastardImpactBonus(weapon);
+                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                {
+                    modifier.ApplyDamageModifier(weapon, original, ref result);
+                }
             }
         }
 
-        public void BastardPostAmplifySpeed(ref Weapon weapon, ref float result)
+        public void PostAffectImpact(ref Weapon weapon, float original, ref float result)
         {
-            if (this.IsBastardMode(weapon) && !CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsActive(weapon))
+            if (this.IsBastardMode(weapon))
             {
-                result += this.GetBastardSpeedBonus(weapon);
+                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                {
+                    modifier.ApplyImpactModifier(weapon, original, ref result);
+                }
+            }
+        }
+
+        public void PostAffectSpeed(ref Weapon weapon, float original, ref float result)
+        {
+            if (this.IsBastardMode(weapon))
+            {
+                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                {
+                    modifier.ApplySpeedModifier(weapon, original, ref result);
+                }
+            }
+        }
+
+        public void PostAffectStaminaCost(ref Weapon weapon, float original, ref float result)
+        {
+            if (this.IsBastardMode(weapon))
+            {
+                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                {
+                    modifier.ApplyStaminaModifier(weapon, original, ref result);
+                }
             }
         }
     }

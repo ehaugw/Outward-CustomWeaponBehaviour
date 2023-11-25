@@ -8,36 +8,6 @@ namespace CustomWeaponBehaviour
 {
     public class MaulShoveBehaviour
     {
-        public virtual float GetMaulShoveSpeedBonus(Weapon weapon)
-        {
-            float modifier = 0;
-            foreach (var modObj in CustomWeaponBehaviour.IMaulShoveModifiers)
-            {
-                modObj.ApplySpeedModifier(weapon, ref modifier);
-            }
-            return modifier;
-        }
-
-        public virtual float GetMaulShoveDamageBonus(Weapon weapon)
-        {
-            float modifier = 1;
-            foreach (var modObj in CustomWeaponBehaviour.IMaulShoveModifiers)
-            {
-                modObj.ApplyDamageModifier(weapon, ref modifier);
-            }
-            return modifier;
-        }
-
-        public virtual float GetMaulShoveImpactBonus(Weapon weapon)
-        {
-            float modifier = 1;
-            foreach (var modObj in CustomWeaponBehaviour.IMaulShoveModifiers)
-            {
-                modObj.ApplyImpactModifier(weapon, ref modifier);
-            }
-            return modifier;
-        }
-
         public virtual bool Eligible(Weapon weapon)
         {
             return weapon.HasTag(CustomWeaponBehaviour.MaulShoveTag);
@@ -59,27 +29,47 @@ namespace CustomWeaponBehaviour
                 );
         }
 
-        public void MaulShovePostAmplifyWeaponDamage(ref Weapon weapon, ref DamageList _damageList)
+        public void PostAffectDamage(ref Weapon weapon, DamageList original, ref DamageList result)
         {
-            if (this.IsMaulShoveMode(weapon) && this.IsActive(weapon))
+            if (this.IsMaulShoveMode(weapon))
             {
-                _damageList *= this.GetMaulShoveDamageBonus(weapon);
+                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                {
+                    modifier.ApplyDamageModifier(weapon, original, ref result);
+                }
             }
         }
 
-        public void MaulShovePostAmplifyWeaponImpact(ref Weapon weapon, ref float _impactDamage)
+        public void PostAffectImpact(ref Weapon weapon, float original, ref float result)
         {
-            if (this.IsMaulShoveMode(weapon) && this.IsActive(weapon))
+            if (this.IsMaulShoveMode(weapon))
             {
-                _impactDamage *= this.GetMaulShoveImpactBonus(weapon);
+                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                {
+                    modifier.ApplyImpactModifier(weapon, original, ref result);
+                }
             }
         }
 
-        public void MaulShovePostAmplifySpeed(ref Weapon weapon, ref float result)
+        public void PostAffectSpeed(ref Weapon weapon, float original, ref float result)
         {
-            if (this.IsMaulShoveMode(weapon) && this.IsActive(weapon))
+            if (this.IsMaulShoveMode(weapon))
             {
-                result += this.GetMaulShoveSpeedBonus(weapon);
+                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                {
+                    modifier.ApplySpeedModifier(weapon, original, ref result);
+                }
+            }
+        }
+
+        public void PostAffectStaminaCost(ref Weapon weapon, float original, ref float result)
+        {
+            if (this.IsMaulShoveMode(weapon))
+            {
+                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                {
+                    modifier.ApplyStaminaModifier(weapon, original, ref result);
+                }
             }
         }
     }

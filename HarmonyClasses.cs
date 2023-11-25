@@ -171,7 +171,7 @@ namespace CustomWeaponBehaviour
     }
 
     //DOES NOT CHANGE DAMAGE, ONLY ENABLES THE SKILL TO BUILD DAMAGE FOR A CUSTOM WEAPON TYPE
-    [HarmonyLib.HarmonyPatch(typeof(WeaponDamage), "BuildDamage", new Type[] { typeof(Character), typeof(DamageList), typeof(float) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Ref })]
+    [HarmonyLib.HarmonyPatch(typeof(WeaponDamage), nameof(WeaponDamage.BuildDamage), new Type[] { typeof(Character), typeof(DamageList), typeof(float) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Ref, ArgumentType.Ref })]
     public class WeaponDamage_BuildDamage
     {
         [HarmonyPrefix]
@@ -235,9 +235,8 @@ namespace CustomWeaponBehaviour
     }
 
     //EXHAUSTIVELY USED FOR CUSTOM MOVESET SPEEDS.
-    //WORKS AS INTENDED, BUT MAY BE SCALED INCORRECTLY BEWTWEEN SPECIAL ATTACK SPEEDS.
-    //TODO: INVESTIGATE DIFFERENTIATING BETWEEN ATTACK ID 0-4 SPEEDS
-    [HarmonyLib.HarmonyPatch(typeof(CharacterStats), "GetAmplifiedAttackSpeed")]
+    //WORKS AS INTENDED
+    [HarmonyLib.HarmonyPatch(typeof(CharacterStats), nameof(CharacterStats.GetAmplifiedAttackSpeed))]
     public class CharacterStats_GetAmplifiedAttackSpeed
     {
         [HarmonyPostfix]
@@ -247,7 +246,44 @@ namespace CustomWeaponBehaviour
 
             if (weapon == null) return;
 
-            CustomBehaviourFormulas.PostAmplifySpeed(weapon, ref __result);
+            CustomBehaviourFormulas.PostAffectSpeed(weapon, ref __result);
+        }
+    }
+
+    [HarmonyPatch(typeof(WeaponStats), nameof(WeaponStats.GetAttackStamCost))]
+    public class WeaponStats_GetAttackStamCost
+    {
+        [HarmonyPostfix]
+        public static void Postfix(WeaponStats __instance, Item ___m_item, ref float __result)
+        {
+            if (___m_item is Weapon weapon)
+            {
+                CustomBehaviourFormulas.PostAffectStaminaCost(weapon, ref __result);
+            }
+        }
+
+    }
+
+    //MANIPULATE IMPACT AT THE MOST BASIC LEVEL
+    [HarmonyLib.HarmonyPatch(typeof(Weapon), "BaseImpact", MethodType.Getter)]
+    public class Weapon_BaseImpact
+    {
+        [HarmonyPostfix]
+        public static void Postfix(Weapon __instance, ref float __result)
+        {
+            CustomBehaviourFormulas.PostAffectImpact(ref __instance, ref __result);
+        }
+    }
+
+    //This patch causes GetAttackImpact to calculate its impact based on Stats.Impact rather than using cached values. Overrides value from the original function entirely and may break other mods
+    [HarmonyLib.HarmonyPatch(typeof(WeaponStats), nameof(WeaponStats.GetAttackImpact))]
+    public class WeaponStats_GetAttackImpact
+    {
+        [HarmonyPostfix]
+        public static void Postfix(WeaponStats __instance, int _attackID, ref float __result, Item ___m_item)
+        {
+            var weapon = (Weapon)___m_item;
+            __result = weapon.Impact * __instance.Attacks[_attackID].Knockback / __instance.Attacks[0].Knockback;
         }
     }
 
@@ -258,101 +294,24 @@ namespace CustomWeaponBehaviour
         [HarmonyPostfix]
         public static void Postfix(Weapon __instance, ref DamageList __result)
         {
-            CustomBehaviourFormulas.PostAmplifyWeaponDamage(ref __instance, ref __result);
+            __result = __result.Clone();
+            CustomBehaviourFormulas.PostAffectDamage(ref __instance, ref __result);
         }
     }
 
-    //FORCES GetDamage TO UPDATED STATS FOR THE SPECIFIC ATTACK ID, BUT DOES NOT CHANGE DAMAGE. DAMAGE CHANGE IS DONE IN Weapon_Damage
-    [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetDamage")]
-    public class Weapon_GetDamage
-    {
-        [HarmonyPrefix]
-        public static void Prefix(Weapon __instance, int _attackID, out List<float> __state)
-        {
-            __state = null;
-
-            if (__instance.Stats?.Attacks != null)
-            {
-                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
-                var old = __instance.Stats.Attacks[index].Damage;
-
-
-                bool changed = false;
-
-                if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(__instance) || CustomWeaponBehaviour.Instance.holyBehaviour.IsHolyWeaponMode(__instance) || CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsMaulShoveMode(__instance))
-                {
-                    changed = true;
-                    __instance.Stats.Attacks[index].Damage = __instance.Damage.ToDamageArray().ToList();
-                }
-
-                if (changed)
-                {
-                    __state = old;
-                }
-            }
-        }
-
-        [HarmonyPostfix]
-        public static void Postfix(Weapon __instance, int _attackID, List<float> __state) // ref DamageList __result
-        {
-            if (__state != null)
-            {
-                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
-                __instance.Stats.Attacks[index].Damage = __state;
-
-            }
-        }
-    }
-
-    //MANIPULATE IMPACT AT THE MOST BASIC LEVEL
-    [HarmonyLib.HarmonyPatch(typeof(Weapon), "BaseImpact", MethodType.Getter)]
-    public class Weapon_BaseImpact
+    //This patch causes GetAttackDamage to calculate its damage based on Stats.Damage rather than using cached values. Overrides value from the original function entirely and may break other mods
+    [HarmonyLib.HarmonyPatch(typeof(WeaponStats), nameof(WeaponStats.GetAttackDamage))]
+    public class WeaponStats_GetAttackDamage
     {
         [HarmonyPostfix]
-        public static void Postfix(Weapon __instance, ref float __result)
+        public static void Postfix(WeaponStats __instance, int _attackID, ref IList<float> __result, Item ___m_item)
         {
-            CustomBehaviourFormulas.PostAmplifyWeaponImpact(ref __instance, ref __result);
-        }
-    }
+            var weapon = (Weapon)___m_item;
+            var damageList = weapon.Damage;
 
-    //FORCES GetKnockback TO USE UPDATED STATS FOR THE SPECIFIC ATTACK ID, BUT DOES NOT CHANGE DAMAGE. DAMAGE CHANGE IS DONE IN Weapon_BaseImpact
-    [HarmonyLib.HarmonyPatch(typeof(Weapon), "GetKnockback")]
-    public class Weapon_GetKnockback
-    {
-        [HarmonyPrefix]
-        public static void Prefix(Weapon __instance, int _attackID, out float? __state)
-        {
-            __state = null;
-
-            if (__instance.Stats?.Attacks != null)
+            for (int i = 0; i < damageList.Count && i < __result.Count; i++)
             {
-                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
-                var old = __instance.Stats.Attacks[index].Knockback;
-
-
-                bool changed = false;
-
-                if (CustomWeaponBehaviour.Instance.bastardBehaviour.IsBastardMode(__instance) || CustomWeaponBehaviour.Instance.holyBehaviour.IsHolyWeaponMode(__instance) || CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsMaulShoveMode(__instance))
-                {
-                    changed = true;
-                    __instance.Stats.Attacks[index].Knockback = __instance.Impact;
-                }
-
-                if (changed)
-                {
-                    __state = old;
-                }
-            }
-        }
-
-        [HarmonyPostfix]
-        public static void Postfix(Weapon __instance, int _attackID, float? __state, ref float __result)
-        {
-            if (__state != null)
-            {
-                int index = (_attackID > __instance.Stats.Attacks.Length - 1 || _attackID < 0) ? 0 : _attackID;
-                __instance.Stats.Attacks[index].Knockback = (float)__state;
-
+                __result[i] = damageList[i].Damage * __instance.Attacks[_attackID].Damage[i] / __instance.Attacks[0].Damage[i];
             }
         }
     }

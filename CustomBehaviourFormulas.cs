@@ -10,41 +10,62 @@ namespace CustomWeaponBehaviour
 {
     public class CustomBehaviourFormulas
     {
-        public static void PostAmplifySpeed(Weapon weapon, ref float result)
+        public static void PostAffectSpeed(Weapon weapon, ref float result)
         {
             if (weapon == null) return;
 
-            CustomWeaponBehaviour.Instance.bastardBehaviour.BastardPostAmplifySpeed(ref weapon, ref result);
-            CustomWeaponBehaviour.Instance.maulShoveBehaviour.MaulShovePostAmplifySpeed(ref weapon, ref result);
+            float original = result;
+            CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectSpeed(ref weapon, original, ref result);
+            CustomWeaponBehaviour.Instance.maulShoveBehaviour.PostAffectSpeed(ref weapon, original, ref result);
 
             if (WeaponManager.Speeds.ContainsKey(weapon.Type) && WeaponManager.Speeds.ContainsKey(BehaviourManager.GetCurrentAnimationType(weapon)))
             {
                 result *= WeaponManager.Speeds[BehaviourManager.GetCurrentAnimationType(weapon)] / WeaponManager.Speeds[weapon.Type];
             }
+
+            if (result < 0)
+            {
+                result = 0;
+            }
         }
 
-        public static void PostAmplifyWeaponDamage(ref Weapon _weapon, ref DamageList _damageList)
+        public static void PostAffectDamage(ref Weapon _weapon, ref DamageList result)
         {
-            var oldDamage = _damageList;
-            _damageList = _damageList.Clone();
-
+            var original = result.Clone();
             foreach (var baseDamageModifier in CustomWeaponBehaviour.IBaseDamageModifiers)
             {
                 if (baseDamageModifier.Eligible(_weapon))
                 {
-                    baseDamageModifier.Apply(_weapon, oldDamage, ref _damageList);
+                    baseDamageModifier.Apply(_weapon, original, ref result);
                 }
             }
 
-            CustomWeaponBehaviour.Instance.maulShoveBehaviour.MaulShovePostAmplifyWeaponDamage(ref _weapon, ref _damageList);
-            CustomWeaponBehaviour.Instance.bastardBehaviour.BastardPostAmplifyWeaponDamage(ref _weapon, ref _damageList);
-            CustomWeaponBehaviour.Instance.holyBehaviour.HolyPostAmplifyWeaponDamage(ref _weapon, ref _damageList);
+            CustomWeaponBehaviour.Instance.maulShoveBehaviour.PostAffectDamage(ref _weapon, original, ref result);
+            CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectDamage(ref _weapon, original, ref result);
+            CustomWeaponBehaviour.Instance.holyBehaviour.PostAffectDamage(ref _weapon, original, ref result);
         }
 
-        public static void PostAmplifyWeaponImpact(ref Weapon _weapon, ref float _impactDamage)
+        public static void PostAffectImpact(ref Weapon _weapon, ref float _impactDamage)
         {
-            CustomWeaponBehaviour.Instance.maulShoveBehaviour.MaulShovePostAmplifyWeaponImpact(ref _weapon, ref _impactDamage);
-            CustomWeaponBehaviour.Instance.bastardBehaviour.BastardPostAmplifyWeaponImpact(ref _weapon, ref _impactDamage);
+            float original = _impactDamage;
+            CustomWeaponBehaviour.Instance.maulShoveBehaviour.PostAffectImpact(ref _weapon, original, ref _impactDamage);
+            CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectImpact(ref _weapon, original, ref _impactDamage);
+            
+            if (_impactDamage < 0) 
+            {
+                _impactDamage = 0;
+            }
+        }
+
+        public static void PostAffectStaminaCost(Weapon _weapon, ref float _staminaCost)
+        {
+            float original = _staminaCost;
+            CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectStaminaCost(ref _weapon, original, ref _staminaCost);
+
+            if (_staminaCost < 0)
+            {
+                _staminaCost = 0;
+            }
         }
     }
 }

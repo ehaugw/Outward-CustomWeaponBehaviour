@@ -7,19 +7,24 @@ namespace CustomWeaponBehaviour
 {
     public class BastardModifier : IBastardModifier
     {
-        public void ApplyDamageModifier(Weapon weapon, ref float modifier)
+        public void ApplyDamageModifier(Weapon weapon, DamageList original, ref DamageList result)
         {
-            modifier += 0.2f;
+            result += original * 0.1f;
         }
 
-        public void ApplyImpactModifier(Weapon weapon, ref float modifier)
+        public void ApplyImpactModifier(Weapon weapon, float original, ref float result)
         {
-           modifier += 0.2f;
+            result += original * 0.1f;
         }
 
-        public void ApplySpeedModifier(Weapon weapon, ref float modifier)
+        public void ApplySpeedModifier(Weapon weapon, float original, ref float result)
         {
-            modifier += 0.0f;
+            result += 0.1f;
+        }
+        
+        public void ApplyStaminaModifier(Weapon weapon, float original, ref float stamina)
+        {
+            stamina += original * -0.4f;
         }
     }
 }
