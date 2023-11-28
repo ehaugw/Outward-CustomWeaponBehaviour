@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using TinyHelper;
 using UnityEngine;
 
@@ -283,7 +284,7 @@ namespace CustomWeaponBehaviour
         public static void Postfix(WeaponStats __instance, int _attackID, ref float __result, Item ___m_item)
         {
             var weapon = (Weapon)___m_item;
-            __result = weapon.Impact * __instance.Attacks[_attackID].Knockback / __instance.Attacks[0].Knockback;
+            __result = weapon.Impact * WeaponStatData.WeaponBaseDataDict[weapon.Type].ImpactMult[_attackID];
         }
     }
 
@@ -309,10 +310,109 @@ namespace CustomWeaponBehaviour
             var weapon = (Weapon)___m_item;
             var damageList = weapon.Damage;
 
+            var damageMult = WeaponStatData.WeaponBaseDataDict[weapon.Type].DamageMult;
+            if (_attackID < 0 || _attackID >= damageMult.Length)
+            {
+                _attackID = 0;
+            }
+
             for (int i = 0; i < damageList.Count && i < __result.Count; i++)
             {
-                __result[i] = damageList[i].Damage * __instance.Attacks[_attackID].Damage[i] / __instance.Attacks[0].Damage[i];
+                __result[i] = damageList[i].Damage * damageMult[_attackID];
             }
         }
+    }
+
+    public class WeaponStatData
+    {
+        public static Dictionary<Weapon.WeaponType, WeaponStatData> WeaponBaseDataDict = new Dictionary<Weapon.WeaponType, WeaponStatData>()
+        {
+           {
+                Weapon.WeaponType.Sword_1H,
+                new WeaponStatData()
+                {   //                         1     2     3     4     5
+                    DamageMult = new float[] { 1.0f, 1.0f, 1.495f, 1.265f, 1.265f },
+                    ImpactMult = new float[] { 1.0f, 1.0f, 1.3f, 1.1f, 1.1f },
+                    StamMult   = new float[] { 1.0f, 1.0f, 1.2f, 1.1f, 1.1f }
+                }
+            },
+            {
+                Weapon.WeaponType.Sword_2H,
+                new WeaponStatData()
+                {   //                         1     2     3     4     5
+                    DamageMult = new float[] { 1.0f, 1.0f, 1.5f, 1.265f, 1.265f },
+                    ImpactMult = new float[] { 1.0f, 1.0f, 1.5f, 1.1f, 1.1f },
+                    StamMult   = new float[] { 1.0f, 1.0f, 1.3f, 1.1f, 1.1f }
+                }
+            },
+            {
+                Weapon.WeaponType.Axe_1H,
+                new WeaponStatData()
+                {   //                         1     2     3     4     5
+                    DamageMult = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.3f },
+                    ImpactMult = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.3f },
+                    StamMult   = new float[] { 1.0f, 1.0f, 1.2f, 1.2f, 1.2f }
+                }
+            },
+            {
+                Weapon.WeaponType.Axe_2H,
+                new WeaponStatData()
+                {   //                         1     2     3     4     5
+                    DamageMult = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.3f },
+                    ImpactMult = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.3f },
+                    StamMult   = new float[] { 1.0f, 1.0f, 1.375f, 1.375f, 1.35f }
+                }
+            },
+            {
+                Weapon.WeaponType.Mace_1H,
+                new WeaponStatData()
+                {   //                         1     2     3     4     5
+                    DamageMult = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.3f },
+                    ImpactMult = new float[] { 1.0f, 1.0f, 2.5f, 1.3f, 1.3f },
+                    StamMult   = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.3f }
+                }
+            },
+            {
+                Weapon.WeaponType.Mace_2H,
+                new WeaponStatData()
+                {   //                         1     2     3      4     5
+                    DamageMult = new float[] { 1.0f, 1.0f, 0.75f, 1.4f, 1.4f },
+                    ImpactMult = new float[] { 1.0f, 1.0f, 2.0f,  1.4f, 1.4f },
+                    StamMult   = new float[] { 1.0f, 1.0f, 1.2f,  1.2f, 1.2f }
+                }
+            },
+            {
+                Weapon.WeaponType.Halberd_2H,
+                new WeaponStatData()
+                {   //                         1     2     3     4     5
+                    DamageMult = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.7f },
+                    ImpactMult = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.7f },
+                    StamMult   = new float[] { 1.0f, 1.0f, 1.25f, 1.25f, 1.75f }
+                }
+            },
+            {
+                Weapon.WeaponType.Spear_2H,
+                new WeaponStatData()
+                {   //                         1     2     3     4     5
+                    DamageMult = new float[] { 1.0f, 1.0f, 1.4f, 1.3f, 1.2f },
+                    ImpactMult = new float[] { 1.0f, 1.0f, 1.2f, 1.2f, 1.1f },
+                    StamMult   = new float[] { 1.0f, 1.0f, 1.25f, 1.25f, 1.25f }
+                }
+            },
+            {
+                Weapon.WeaponType.FistW_2H,
+                new WeaponStatData()
+                {   //                         1     2     3     4     5
+                    DamageMult = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.3f },
+                    ImpactMult = new float[] { 1.0f, 1.0f, 1.3f, 1.3f, 1.3f },
+                    StamMult   = new float[] { 1.0f, 1.0f, 1.3f, 1.2f, 1.2f }
+                }
+            }
+        };
+
+
+        public float[] DamageMult;
+        public float[] ImpactMult;
+        public float[] StamMult;
     }
 }
