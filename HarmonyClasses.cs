@@ -2,6 +2,7 @@
 //using SideLoader;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TinyHelper;
 using UnityEngine;
 
@@ -287,7 +288,12 @@ namespace CustomWeaponBehaviour
             {
                 currentType = (Weapon.WeaponType)animator.GetInteger("WeaponType");
             }
-            __result = weapon.Impact * WeaponStatData.WeaponBaseDataDict[currentType].ImpactMult[_attackID];
+            var impactMult = 1f;
+            if (WeaponStatData.WeaponBaseDataDict.Keys.Contains(currentType))
+            {
+                impactMult = WeaponStatData.WeaponBaseDataDict[currentType].ImpactMult[_attackID];
+            }
+            __result = weapon.Impact * impactMult;
         }
     }
 
@@ -311,7 +317,6 @@ namespace CustomWeaponBehaviour
         public static void Postfix(WeaponStats __instance, int _attackID, ref IList<float> __result, Item ___m_item)
         {
             var weapon = (Weapon)___m_item;
-            var damageList = weapon.Damage;
 
 
             var currentType = weapon.Type;
@@ -320,13 +325,18 @@ namespace CustomWeaponBehaviour
                 currentType = (Weapon.WeaponType) animator.GetInteger("WeaponType");
             }
 
-            var damageMult = WeaponStatData.WeaponBaseDataDict[currentType].DamageMult;
+            var damageMult = new float[] { 1f, 1f, 1f, 1f, 1f };
+            if (WeaponStatData.WeaponBaseDataDict.Keys.Contains(currentType))
+            {
+                damageMult = WeaponStatData.WeaponBaseDataDict[currentType].DamageMult;
+            }
 
             if (_attackID < 0 || _attackID >= damageMult.Length)
             {
                 _attackID = 0;
             }
 
+            var damageList = weapon.Damage;
             for (int i = 0; i < damageList.Count && i < __result.Count; i++)
             {
                 __result[i] = damageList[i].Damage * damageMult[_attackID];
