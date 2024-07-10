@@ -8,6 +8,11 @@ publish:
 	echo "Cannot publish helper dll as standalone mod"
 install:
 	echo "Cannot install helper dll as standalone mod"
+installothers:
+	(cd ../Crusader && make install)
+	(cd ../Juggernaut && make install)
+	(cd ../MartialArtist && make install)
+	(cd ../CustomMovesetPack && make install)
 clean:
 	rm -f -r public
 	rm -f $(modname).rar
@@ -15,4 +20,4 @@ clean:
 info:
 	echo Modname: $(modname)
 play:
-	(cd .. && make install && make play)
+	make installothers && (cd .. && make play)
