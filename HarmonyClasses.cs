@@ -291,7 +291,15 @@ namespace CustomWeaponBehaviour
             var impactMult = 1f;
             if (WeaponStatData.WeaponBaseDataDict.Keys.Contains(currentType))
             {
-                impactMult = WeaponStatData.WeaponBaseDataDict[currentType].ImpactMult[_attackID];
+                var impactMultArray = WeaponStatData.WeaponBaseDataDict[currentType].ImpactMult;
+
+
+                if (_attackID < 0 || _attackID >= impactMultArray.Length)
+                {
+                    _attackID = 0;
+                }
+
+                impactMult = impactMultArray[_attackID];
             }
             __result = weapon.Impact * impactMult;
         }
