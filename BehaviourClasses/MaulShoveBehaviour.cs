@@ -16,7 +16,7 @@ namespace CustomWeaponBehaviour
         public virtual bool IsActive(Weapon weapon)
         {
             //return true;
-            return weapon.Type != Weapon.WeaponType.Mace_2H && BehaviourManager.GetCurrentAnimationType(weapon) == Weapon.WeaponType.Mace_2H;
+            return weapon.Type != Weapon.WeaponType.Mace_2H && BehaviourManager.GetCurrentAnimationType(weapon) == Weapon.WeaponType.Mace_2H && IsMaulShoveMode(weapon);
         }
 
         public bool IsMaulShoveMode(Weapon weapon)
@@ -31,9 +31,9 @@ namespace CustomWeaponBehaviour
 
         public void PostAffectDamage(ref Weapon weapon, DamageList original, ref DamageList result)
         {
-            if (this.IsMaulShoveMode(weapon))
+            if (IsActive(weapon))
             {
-                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                foreach (var modifier in CustomWeaponBehaviour.IMaulShoveModifiers)
                 {
                     modifier.ApplyDamageModifier(weapon, original, ref result);
                 }
@@ -42,9 +42,9 @@ namespace CustomWeaponBehaviour
 
         public void PostAffectImpact(ref Weapon weapon, float original, ref float result)
         {
-            if (this.IsMaulShoveMode(weapon))
+            if (IsActive(weapon))
             {
-                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                foreach (var modifier in CustomWeaponBehaviour.IMaulShoveModifiers)
                 {
                     modifier.ApplyImpactModifier(weapon, original, ref result);
                 }
@@ -53,22 +53,11 @@ namespace CustomWeaponBehaviour
 
         public void PostAffectSpeed(ref Weapon weapon, float original, ref float result)
         {
-            if (this.IsMaulShoveMode(weapon))
+            if (IsActive(weapon))
             {
-                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
+                foreach (var modifier in CustomWeaponBehaviour.IMaulShoveModifiers)
                 {
                     modifier.ApplySpeedModifier(weapon, original, ref result);
-                }
-            }
-        }
-
-        public void PostAffectStaminaCost(ref Weapon weapon, float original, ref float result)
-        {
-            if (this.IsMaulShoveMode(weapon))
-            {
-                foreach (var modifier in CustomWeaponBehaviour.IBastardModifiers)
-                {
-                    modifier.ApplyStaminaModifier(weapon, original, ref result);
                 }
             }
         }
