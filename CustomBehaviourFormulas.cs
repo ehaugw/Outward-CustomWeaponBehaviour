@@ -15,10 +15,11 @@ namespace CustomWeaponBehaviour
             if (weapon == null) return;
 
             float original = result;
-            CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectSpeed(ref weapon, original, ref result);
+            CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectSpeed(ref weapon, original, ref result); //keep in mind bastard behaviour is disabled when maul shove is active, so you can't stack both
             CustomWeaponBehaviour.Instance.maulShoveBehaviour.PostAffectSpeed(ref weapon, original, ref result);
 
-            if (WeaponManager.Speeds.ContainsKey(weapon.Type) && WeaponManager.Speeds.ContainsKey(BehaviourManager.GetCurrentAnimationType(weapon)))
+            // maul shove does not have weapon type compensated speeds like regular attack moves
+            if (WeaponManager.Speeds.ContainsKey(weapon.Type) && WeaponManager.Speeds.ContainsKey(BehaviourManager.GetCurrentAnimationType(weapon)) && !CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsActive(weapon))
             {
                 result *= WeaponManager.Speeds[BehaviourManager.GetCurrentAnimationType(weapon)] / WeaponManager.Speeds[weapon.Type];
             }

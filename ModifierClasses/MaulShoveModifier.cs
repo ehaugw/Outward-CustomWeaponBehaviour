@@ -33,7 +33,7 @@ namespace CustomWeaponBehaviour
 
         public void ApplySpeedModifier(Weapon weapon, float original, ref float result)
         {
-            result += original * -0.2f;
+            //result += original * -0.2f;
         }
     }
 }
