@@ -33,7 +33,15 @@ namespace CustomWeaponBehaviour
             return Eligible(weapon) && weapon.IsEquipped
                 && (
                     weapon.OwnerCharacter?.LeftHandEquipment == null || 
-                    (weapon.OwnerCharacter?.LeftHandEquipment is Equipment leftHand && leftHand.HasTag(CustomWeaponBehaviour.HandsFreeTag)/* && leftHand.IKType == Equipment.IKMode.None*/)
+                    (
+                        weapon.OwnerCharacter?.LeftHandEquipment is Equipment leftHand
+                        && leftHand.HasTag(CustomWeaponBehaviour.HandsFreeTag)
+                        //&&
+                        //(
+                        //    leftHand.IKType == Equipment.IKMode.None
+                        //    || leftHand.IKType == Equipment.IKMode.Lantern && !weapon.OwnerCharacter.Sprinting
+                        //)
+                    )
                 ) && !CustomWeaponBehaviour.Instance.maulShoveBehaviour.IsActive(weapon);
         }
 

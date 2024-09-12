@@ -25,12 +25,12 @@ namespace CustomWeaponBehaviour
 
         public virtual bool OffhandEligible(Character character)
         {
-            return character?.LeftHandEquipment is Weapon offhand && (offhand.Type != Weapon.WeaponType.Shield || offhand.HasTag(CustomWeaponBehaviour.BucklerTag));
+            return true;
         }
 
         public virtual bool Eligible(Weapon weapon)
         {
-            return weapon.HasTag(CustomWeaponBehaviour.ParryTag);
+            return true;
         }
 
         public virtual bool DidSuccessfulParry(Weapon weapon)
