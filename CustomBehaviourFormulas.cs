@@ -44,6 +44,8 @@ namespace CustomWeaponBehaviour
             CustomWeaponBehaviour.Instance.maulShoveBehaviour.PostAffectDamage(ref _weapon, original, ref result);
             CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectDamage(ref _weapon, original, ref result);
             CustomWeaponBehaviour.Instance.holyBehaviour.PostAffectDamage(ref _weapon, original, ref result);
+
+            CustomWeaponBehaviour.GeneralWeaponDamageModifiers(_weapon, original, ref result);
         }
 
         public static void PostAffectImpact(ref Weapon _weapon, ref float _impactDamage)
@@ -51,7 +53,7 @@ namespace CustomWeaponBehaviour
             float original = _impactDamage;
             CustomWeaponBehaviour.Instance.maulShoveBehaviour.PostAffectImpact(ref _weapon, original, ref _impactDamage);
             CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectImpact(ref _weapon, original, ref _impactDamage);
-            
+
             if (_impactDamage < 0) 
             {
                 _impactDamage = 0;
