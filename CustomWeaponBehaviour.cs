@@ -20,7 +20,7 @@
     public class CustomWeaponBehaviour : BaseUnityPlugin
     {
         public const string GUID = "com.ehaugw.customweaponbehaviour";
-        public const string VERSION = "4.0.0";
+        public const string VERSION = "4.0.1";
         public const string NAME = "Custom Weapon Behaviour";
         public static CustomWeaponBehaviour Instance;
         public static Tag BastardTag;
@@ -108,19 +108,6 @@
 
         private void OnPacksLoaded()
         {
-        }
-
-        public static void ChangeGrip(Character character, Weapon.WeaponType toMoveset)
-        {
-            character?.Animator?.SetInteger("WeaponType", (int) toMoveset);
-        }
-
-        public static void ResetGrip(Character character)
-        {
-            if (character?.CurrentWeapon is Weapon weapon)
-                character?.Animator?.SetInteger("WeaponType", (int)weapon.Type);
-            if (character?.LeftHandEquipment is Equipment item && item.HasTag(HandsFreeTag) && item.HasTag(LanternTag) && item.IKType == Equipment.IKMode.None)
-                item.IKType = Equipment.IKMode.Lantern;
         }
     }
 }

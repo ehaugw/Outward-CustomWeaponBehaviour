@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace CustomWeaponBehaviour
 {
+    using CustomGrip;
     public class BehaviourManager
     {
         public static Weapon.WeaponType GetCurrentAnimationType(Weapon weapon)
@@ -40,7 +41,7 @@ namespace CustomWeaponBehaviour
                     //Weapon skills with _type == 2502 are the "weapon skills" that takes only one type of weapon. My patch temporarly appends new weapon types that would get other animations from animator, unless we change grip to the original (first) weapon type.
                     if (skill.RequiredWeaponTypes[0] != _weapon.Type)
                     {
-                        CustomWeaponBehaviour.ChangeGrip(__instance, skill.RequiredWeaponTypes[0]);
+                        CustomGrip.ChangeGrip(__instance, skill.RequiredWeaponTypes[0]);
                         return true;
                     }
                 }
@@ -51,7 +52,7 @@ namespace CustomWeaponBehaviour
             {
                 if (_type == 1 && !IsComboAttack(__instance, _type, _id))
                 {
-                    CustomWeaponBehaviour.ChangeGrip(__instance, Weapon.WeaponType.Axe_1H);
+                    CustomGrip.ChangeGrip(__instance, Weapon.WeaponType.Axe_1H);
                     return true;
                 }
 
@@ -62,7 +63,7 @@ namespace CustomWeaponBehaviour
                 if (_type == 1 && !IsComboAttack(__instance, _type, _id))
                 {
                     _type = 0;
-                    CustomWeaponBehaviour.ChangeGrip(__instance, Weapon.WeaponType.Spear_2H);
+                    CustomGrip.ChangeGrip(__instance, Weapon.WeaponType.Spear_2H);
                     return true;
                 }
             }
@@ -71,7 +72,7 @@ namespace CustomWeaponBehaviour
             {
                 if (_type == 1 && !IsComboAttack(__instance, _type, _id))
                 {
-                    CustomWeaponBehaviour.ChangeGrip(__instance, Weapon.WeaponType.Mace_2H);
+                    CustomGrip.ChangeGrip(__instance, Weapon.WeaponType.Mace_2H);
                     //_weapon.Unblockable
                     return true;
                 }
@@ -83,7 +84,7 @@ namespace CustomWeaponBehaviour
                 {
                     if (new int[] {0, 1, 2500}.Contains(_type)) //Basic attacks and predator leap
                     {
-                        CustomWeaponBehaviour.ChangeGrip(__instance, bastardType);
+                        CustomGrip.ChangeGrip(__instance, bastardType);
                         if (__instance?.LeftHandEquipment is Equipment item && item.HasTag(CustomWeaponBehaviour.HandsFreeTag) && item.HasTag(CustomWeaponBehaviour.LanternTag) && item.IKType == Equipment.IKMode.Lantern)
                             item.IKType = Equipment.IKMode.None;
                         return true;
@@ -92,7 +93,7 @@ namespace CustomWeaponBehaviour
                     ////This will cause skill to not apply damage
                     //if (_type == 2502 && bastardType == Weapon.WeaponType.Sword_2H)
                     //{
-                    //    CustomWeaponBehaviour.ChangeGrip(__instance, Weapon.WeaponType.Spear_2H);
+                    //    CustomGrip.ChangeGrip(__instance, Weapon.WeaponType.Spear_2H);
                     //    _type = 1;
                     //    return true;
                     //}

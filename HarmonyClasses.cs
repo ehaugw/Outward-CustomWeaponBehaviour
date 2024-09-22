@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace CustomWeaponBehaviour
 {
+    using CustomGrip;
 
     //SOONER SKILL START
     [HarmonyPatch(typeof(Skill), "HasAllRequirements")]
@@ -57,31 +58,6 @@ namespace CustomWeaponBehaviour
         public static void Prefix(Character __instance, ref int _type, ref int _id)
         {
             BehaviourManager.AdaptGrip(__instance, ref _type, ref _id);
-        }
-    }
-
-    //TERMINATE CUSTOM MOVESET
-    [HarmonyLib.HarmonyPatch(typeof(Character), "HitEnded")]
-    public class Character_HitEnded
-    {
-        [HarmonyPrefix]
-        public static void Prefix(Character __instance, ref int _attackID)
-        {
-            if (_attackID != -2 && !__instance.IsCasting)
-            {
-                CustomWeaponBehaviour.ResetGrip(__instance);
-            }
-        }
-    }
-
-    //TERMINATE CUSTOM MOVESET
-    [HarmonyLib.HarmonyPatch(typeof(Character), "StopLocomotionAction")]
-    public class Character_StopLocomotionAction
-    {
-        [HarmonyPrefix]
-        public static void Prefix(Character __instance)
-        {
-            CustomWeaponBehaviour.ResetGrip(__instance);
         }
     }
 
