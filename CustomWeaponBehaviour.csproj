@@ -52,7 +52,6 @@
     <Compile Include="ModifierClasses\IMaulShoveModifier.cs" />
     <Compile Include="RND.cs" />
     <Compile Include="CustomBehaviourFormulas.cs" />
-    <Compile Include="Effects\EnableHitDetection.cs" />
     <Compile Include="Effects\WeaponSkillAnimationSelector.cs" />
     <Compile Include="HarmonyClasses.cs" />
     <Compile Include="CustomWeaponBehaviour.cs" />
