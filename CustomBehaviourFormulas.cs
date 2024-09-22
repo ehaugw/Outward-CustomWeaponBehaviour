@@ -30,27 +30,15 @@ namespace CustomWeaponBehaviour
             }
         }
 
-        public static void PostAffectDamage(ref Weapon _weapon, ref DamageList result)
+        public static void PostAffectDamage(ref Weapon _weapon, DamageList original, ref DamageList result)
         {
-            var original = result.Clone();
-            foreach (var baseDamageModifier in CustomWeaponBehaviour.IBaseDamageModifiers)
-            {
-                if (baseDamageModifier.Eligible(_weapon))
-                {
-                    baseDamageModifier.Apply(_weapon, original, ref result);
-                }
-            }
-
             CustomWeaponBehaviour.Instance.maulShoveBehaviour.PostAffectDamage(ref _weapon, original, ref result);
             CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectDamage(ref _weapon, original, ref result);
             CustomWeaponBehaviour.Instance.holyBehaviour.PostAffectDamage(ref _weapon, original, ref result);
-
-            CustomWeaponBehaviour.GeneralWeaponDamageModifiers(_weapon, original, ref result);
         }
 
-        public static void PostAffectImpact(ref Weapon _weapon, ref float _impactDamage)
+        public static void PostAffectImpact(ref Weapon _weapon, float original, ref float _impactDamage)
         {
-            float original = _impactDamage;
             CustomWeaponBehaviour.Instance.maulShoveBehaviour.PostAffectImpact(ref _weapon, original, ref _impactDamage);
             CustomWeaponBehaviour.Instance.bastardBehaviour.PostAffectImpact(ref _weapon, original, ref _impactDamage);
 

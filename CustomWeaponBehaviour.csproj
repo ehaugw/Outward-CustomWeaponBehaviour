@@ -48,7 +48,6 @@
     <Compile Include="BehaviourClasses\HolyBehaviour.cs" />
     <Compile Include="BehaviourClasses\FinesseBehaviour.cs" />
     <Compile Include="BehaviourManager.cs" />
-    <Compile Include="ModifierClasses\IBaseDamageModifier.cs" />
     <Compile Include="ModifierClasses\IBastardModifier.cs" />
     <Compile Include="ModifierClasses\IMaulShoveModifier.cs" />
     <Compile Include="RND.cs" />
@@ -112,6 +111,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BaseDamageModifiers\BaseDamageModifiers.csproj">
+      <Project>{0e3a3ef3-64b4-4eee-bcfa-9e80bba7d284}</Project>
+      <Name>BaseDamageModifiers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HolyDamageManager\HolyDamageManager.csproj">
       <Project>{871a4a4a-70c0-4995-8b51-5815c7ec432d}</Project>
       <Name>HolyDamageManager</Name>

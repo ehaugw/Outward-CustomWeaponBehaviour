@@ -10,15 +10,17 @@
     using InstanceIDs;
     using System;
     using System.Linq;
+    using BaseDamageModifiers;
 
     [BepInPlugin(GUID, NAME, VERSION)]
     [BepInDependency("com.sinai.SideLoader", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(BaseDamageModifiers.GUID, BaseDamageModifiers.VERSION)]
     [BepInDependency(HolyDamageManager.GUID, HolyDamageManager.VERSION)]
     [BepInDependency(TinyHelper.GUID, TinyHelper.VERSION)]
     public class CustomWeaponBehaviour : BaseUnityPlugin
     {
         public const string GUID = "com.ehaugw.customweaponbehaviour";
-        public const string VERSION = "3.2.0";
+        public const string VERSION = "4.0.0";
         public const string NAME = "Custom Weapon Behaviour";
         public static CustomWeaponBehaviour Instance;
         public static Tag BastardTag;
@@ -46,11 +48,6 @@
 
         public static List<IBastardModifier> IBastardModifiers = new List<IBastardModifier>();
         public static List<IMaulShoveModifier> IMaulShoveModifiers = new List<IMaulShoveModifier>();
-        public static List<IBaseDamageModifier> IBaseDamageModifiers = new List<IBaseDamageModifier>();
-
-        public delegate void GeneralWeaponDamageModifier(Weapon weapon, DamageList original, ref DamageList result);
-        public static GeneralWeaponDamageModifier GeneralWeaponDamageModifiers = delegate (Weapon weapon, DamageList original, ref DamageList result) { };
-
 
         internal void Awake()
         {
@@ -64,6 +61,9 @@
             SL.BeforePacksLoaded += BeforePacksLoaded;
             SL.OnPacksLoaded += OnPacksLoaded;
             TinyHelper.OnDescriptionModified += CustomTagDescriptionModifier;
+
+            BaseDamageModifiers.WeaponDamageModifiers += delegate (Weapon weapon, DamageList original, ref DamageList result) { CustomBehaviourFormulas.PostAffectDamage(ref weapon, original, ref result); };
+            BaseDamageModifiers.WeaponImpactModifiers += delegate (Weapon weapon, float original, ref float result) { CustomBehaviourFormulas.PostAffectImpact(ref weapon, original, ref result); };
         }
 
         private void CustomTagDescriptionModifier(Item item, ref string description)
@@ -112,9 +112,6 @@
 
         public static void ChangeGrip(Character character, Weapon.WeaponType toMoveset)
         {
-            //WHY?
-            character.Inventory.SkillKnowledge.AddItem(new Item());
-
             character?.Animator?.SetInteger("WeaponType", (int) toMoveset);
         }
 
