@@ -20,7 +20,7 @@
     public class CustomWeaponBehaviour : BaseUnityPlugin
     {
         public const string GUID = "com.ehaugw.customweaponbehaviour";
-        public const string VERSION = "4.0.2";
+        public const string VERSION = "4.0.3";
         public const string NAME = "Custom Weapon Behaviour";
         public static CustomWeaponBehaviour Instance;
         public static Tag BastardTag;

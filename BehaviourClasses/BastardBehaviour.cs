@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InstanceIDs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,7 +26,7 @@ namespace CustomWeaponBehaviour
 
         public virtual bool Eligible(Weapon weapon)
         {
-            bool eligible = weapon.HasTag(CustomWeaponBehaviour.BastardTag) && !weapon.TwoHanded;
+            bool eligible = weapon.HasTag(CustomWeaponBehaviour.BastardTag) && !weapon.TwoHanded && weapon.transform.FindAllInAllChildren(IDs.TAG_TRANSFORM_DISABLE_BASTARD_MOVESET).Count() == 0;
             CustomWeaponBehaviour.Instance.BastardDisablers(weapon, ref eligible);
             return eligible;
         }
