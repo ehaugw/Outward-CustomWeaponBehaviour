@@ -20,7 +20,7 @@
     public class CustomWeaponBehaviour : BaseUnityPlugin
     {
         public const string GUID = "com.ehaugw.customweaponbehaviour";
-        public const string VERSION = "4.0.1";
+        public const string VERSION = "4.0.2";
         public const string NAME = "Custom Weapon Behaviour";
         public static CustomWeaponBehaviour Instance;
         public static Tag BastardTag;
@@ -48,6 +48,9 @@
 
         public static List<IBastardModifier> IBastardModifiers = new List<IBastardModifier>();
         public static List<IMaulShoveModifier> IMaulShoveModifiers = new List<IMaulShoveModifier>();
+
+        public delegate void BastardDisabler(Weapon weapon, ref bool eligible);
+        public BastardDisabler BastardDisablers = delegate (Weapon weapon, ref bool eligible) { };
 
         internal void Awake()
         {

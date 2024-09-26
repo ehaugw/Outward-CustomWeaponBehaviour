@@ -25,7 +25,9 @@ namespace CustomWeaponBehaviour
 
         public virtual bool Eligible(Weapon weapon)
         {
-            return weapon.HasTag(CustomWeaponBehaviour.BastardTag) && !weapon.TwoHanded;
+            bool eligible = weapon.HasTag(CustomWeaponBehaviour.BastardTag) && !weapon.TwoHanded;
+            CustomWeaponBehaviour.Instance.BastardDisablers(weapon, ref eligible);
+            return eligible;
         }
 
         public bool IsBastardMode(Weapon weapon)
